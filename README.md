@@ -137,3 +137,34 @@ parentObject's insert_opt
 **Screenshot**
 
 http://shining-lucy.com/wiki/page.php?id=devwiki:template:universal_tool_template
+
+#LNTextEdit.py
+
+  * a line number text edit Ui element, a replacement of the original LNTextEdit and my variations like LNTextEditEx, LNTextEdit_Pside, LNTextEdit_PyQt
+
+**usage**
+
+```python
+import LNTextEdit
+display_textEdit = LNTextEdit.LNTextEdit()
+display_textEdit.setWrap(0)
+display_textEdit.setReadOnly(1)
+display_textEdit.setReadOnlyStyle(1)
+display_textEdit.setZoom(1) # enable text zoom feature
+```
+
+**feature list**
+
+version 3.2: (2016.09.01)
+  * add get/set/resetFontSize function
+  * support ctrl+mouse wheel zoom in out text area, need to setZoom(1)
+version 3.1:
+  * (v3.1.2) add unicode support for file url
+  * add multiple files drop as path text input
+  * add insertText function
+version 3.0:
+  * support drag and drop file or file url as url text
+  * support setReadOnly and setReadOnlyStyle function
+  * support setWrap() quick function
+  * support text() function
+  * better and clear code for PyQt4 and PySide
