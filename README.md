@@ -172,7 +172,7 @@ version 3.0:
   * support text() function
   * better and clear code for PyQt4 and PySide
   
-#UITranslator
+#UITranslator.py
 
   * A tool to create UI interface translation language json file for auto load into universal tool template
   * Note: UITranslator works for any tool created based on universal tool template above v6.1
@@ -183,6 +183,7 @@ version 3.0:
   * load multiple language json file
 
 **Usage**
+  * language file naming format: ToolName_lang_YourLanguageName.json
   * usage in maya: 
 ```python
 import UITranslator
