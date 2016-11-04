@@ -1,1 +1,1 @@
-ToolName.icon here
+ToolName.png tool icon here, 32x32
