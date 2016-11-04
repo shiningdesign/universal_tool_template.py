@@ -168,3 +168,32 @@ version 3.0:
   * support setWrap() quick function
   * support text() function
   * better and clear code for PyQt4 and PySide
+  
+#UITranslator
+
+  * A tool to create UI interface translation language json file for auto load into universal tool template
+  * Note: UITranslator works for any tool created based on universal tool template above v6.1
+
+**Feature**
+  * load default language that exported from your tool based on universal tool template above v6.1
+  * create new translation and store them in memory before export to a language json file
+  * load multiple language json file
+
+**Usage**
+  * usage in maya: 
+```python
+import UITranslator
+UITranslator.main()
+```
+  * usage in commandline:
+```python
+python UITranslator.py
+```
+
+**File Structure**
+  * UITranslator.py
+  * LNTextEdit.py: mod 3rd party line number text edit ui element
+  * icons/UITranslator.png: (32x32) https://icons8.com/web-app/for/all/translate
+
+**screenshot**
+
