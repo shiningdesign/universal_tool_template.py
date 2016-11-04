@@ -183,7 +183,7 @@ version 3.0:
   * load multiple language json file
 
 **Usage**
-  * language file naming format: ToolName_lang_YourLanguageName.json
+  * language file naming format: ```ToolName_lang_YourLanguageName.json```
   * usage in maya: 
 ```python
 import UITranslator
