@@ -49,15 +49,16 @@ a quick Qt GUI tool development template for both Maya or Desktop application, s
     - now quickSplitUI() supports more than 2 layouts or widgets
 
 **Usage**
-  * usage in maya: <code python>
+  * usage in maya: ```python
 import universal_tool_template
 universal_tool_template.main()
-</code>
-  * usage in commandline: <code python>
+```
+  * usage in commandline: ```python
 python universal_tool_template.py
-</code>
+```
 
-  * version 7 syntax <code>
+  * version 7 syntax 
+```python
 quickUI(["elementA_btn;QPushButton;Title Here"], "config_layout;QVBoxLayout")
 
 element_list:
@@ -108,16 +109,14 @@ parent_name;parent_type;parent_opts
 -------------------------------------
 parentObject's insert_opt
 -------------------------------------
-</code>
+```
+
 **File Structure**
 
   * universal_tool_template.py: main GUI and core function
-  * [[devwiki:template:lntextedit|LNTextEdit.py]]: (required) if you want to use LNTextEdit in your tool.
+  * (required) if you want to use LNTextEdit in your tool.
 
 
 **Screenshot**
 
-  * version 7.3 \\ {{:devwiki:template:universal_tool_template_v7.3.png|}}
-  * version 5.0 \\ {{:devwiki:template:universal_tool_template_v5.0.png|}}
-  * version 4.0 \\ {{:devwiki:template:universal_tool_template_v4.0.png|}}
-  * version 3.0 \\ {{:devwiki:template:universal_tool_template_v3.0.png|}}
+http://shining-lucy.com/wiki/page.php?id=devwiki:template:universal_tool_template
