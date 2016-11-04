@@ -1,6 +1,21 @@
 # universal_tool_template.py
 a quick Qt GUI tool development template for both Maya or Desktop application, supports automatically for both PySide and PyQt4
 
+**Key Feature**
+  - automatically detect whether run in Maya panel mode or Desktop mode and its location
+  - automatically detect to use PySide Qt binding or PyQt4 Qt binding
+  - universal coding format, seamlessly works in all 4 combination conditions
+  - built-in json file operation and format text operation
+  - built-in quickUI() v4.0 features and more example integrated inside, supported nested quickUI without expanding elements
+  - built-in qui() v1.0 features and more example integrated inside
+  - built-in automatically button, menuItem, message button action binding
+  - standalone, frameless, transparent-irregular-win-shape and always-on-top option
+  - drag, move, right-click-menu window interface interaction functions
+  - example of invisible but functional button
+  - automatically use modern style for desktop app
+  - automatically icon load
+  - auto self location detection for both script mode and app mode
+
 **Feature**
   * version 7.3: (2016.10.13)
     * 7.3.1: minor tune for better look and notation, add 'tree, txt, space' on qui (2016.10.24)
