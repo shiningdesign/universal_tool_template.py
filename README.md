@@ -201,3 +201,13 @@ python UITranslator.py
 **screenshot**
 
 ![uitranslator_v1.0.png](screenshot/uitranslator_v1.0.png?raw=true)
+
+#automatic Maya Tool Shelf Installer mel script (install_ToolName.mel)
+  * a script template that automatically install its nearby python tool to shelf, with icon set as well, in a simple process of drag-n-drop into maya window.
+
+**Installer ver 2 Usage**
+  - it is fully auto, just need to change mel file name as this format "install_YourPythonFileName.mel"
+  - put this file next to your python script file, your icon (32x32) with same name under "icons" folder
+
+#cross-platform cx_Freeze binary build script
+  * just change the ToolName, and includes the folder or resource, then run buildScript in windows, mac, linux to create binary
