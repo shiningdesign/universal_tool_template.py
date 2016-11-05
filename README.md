@@ -64,7 +64,14 @@ a quick Qt GUI tool development template for both Maya or Desktop application, s
     - now quickSplitUI() supports more than 2 layouts or widgets
 
 **Usage**
-  * usage in maya: 
+
+  * Prepare into Your Tool:
+    1. search and find all these and do replace with your App or Tool name 
+`find: "TMP_UniversalToolUI_TND"; replace: "YourToolName"; inside the "universal_tool_template.py" file`
+    2. change the file name from "universal_tool_template.py" into "YourToolName.py"
+    3. use in maya: `import YourToolName;YourToolName.main()`
+    4. use in cmd: `python YourToolName.py`
+  * direct usage in maya: 
 ```python
 import universal_tool_template
 universal_tool_template.main()
