@@ -1,9 +1,12 @@
 '''
-LNTextEdit v3.2
+LNTextEdit v4.0
 Text widget with support for line numbers
 http://john.nachtimwald.com/2009/08/19/better-qplaintextedit-with-line-numbers/
 
 mod: by ying - http://shining-lucy.com/wiki
+v4.0
+ * python 3 support
+ * pyside, pyside2, pyqt4, pyqt5 support
 v3.2
  * re/set/getFontSize and font size add zoom in out and scoll zoom event
 v3.1.2
@@ -17,27 +20,48 @@ v3.1
  * remove qvariant and update more code to work for both pyside and pyqt
 '''
 
-#from PySide import QtGui,QtCore
-#from PyQt4 import QtGui,QtCore
+# python 2,3 support unicode function
+try:
+    UNICODE_EXISTS = bool(type(unicode))
+except NameError:
+    unicode = lambda s: str(s)
 
 try:
-    from PySide import QtGui,QtCore
+    from PySide import QtGui, QtCore
+    import PySide.QtGui as QtWidgets
+    print("PySide Try")
+    qtMode = 0
 except ImportError:
-    from PyQt4 import QtGui,QtCore
-
-class LNTextEdit(QtGui.QFrame):
+    try:
+        from PySide2 import QtCore, QtGui, QtWidgets
+        print("PySide2 Try")
+        qtMode = 2
+    except ImportError:
+        try:
+            from PyQt4 import QtGui,QtCore
+            import PyQt4.QtGui as QtWidgets
+            import sip
+            qtMode = 1
+            print("PyQt4 Try")
+        except ImportError:
+            from PyQt5 import QtGui,QtCore,QtWidgets
+            import sip
+            qtMode = 3
+            print("PyQt5 Try")
+            
+class LNTextEdit(QtWidgets.QFrame):
  
-    class NumberBar(QtGui.QWidget):
+    class NumberBar(QtWidgets.QWidget):
  
         def __init__(self, edit):
-            QtGui.QWidget.__init__(self, edit)
+            QtWidgets.QWidget.__init__(self, edit)
             
             self.edit = edit
             self.adjustWidth(1)
             
         def paintEvent(self, event):
             self.edit.numberbarPaint(self, event)
-            QtGui.QWidget.paintEvent(self, event)
+            QtWidgets.QWidget.paintEvent(self, event)
  
         def adjustWidth(self, count):
             width = self.fontMetrics().width(unicode(count))
@@ -55,13 +79,13 @@ class LNTextEdit(QtGui.QFrame):
                 # selected.
                 self.update()
                 
-    class PlainTextEdit(QtGui.QPlainTextEdit):
+    class PlainTextEdit(QtWidgets.QPlainTextEdit):
         def __init__(self, *args):
-            QtGui.QPlainTextEdit.__init__(self, *args)
-            self.setFrameStyle(QtGui.QFrame.NoFrame)
+            QtWidgets.QPlainTextEdit.__init__(self, *args)
+            self.setFrameStyle(QtWidgets.QFrame.NoFrame)
             self.zoomWheelEnabled = 0
             self.highlight()
-            #self.setLineWrapMode(QtGui.QPlainTextEdit.NoWrap)
+            #self.setLineWrapMode(QtWidgets.QPlainTextEdit.NoWrap)
             self.cursorPositionChanged.connect(self.highlight)
         
         def dragEnterEvent( self, event ):
@@ -104,10 +128,10 @@ class LNTextEdit(QtGui.QFrame):
                     elif event.delta() == -120:
                         self.zoom_out()
                 event.ignore()
-            QtGui.QPlainTextEdit.wheelEvent(self, event)
+            QtWidgets.QPlainTextEdit.wheelEvent(self, event)
             
         def highlight(self):
-            hi_selection = QtGui.QTextEdit.ExtraSelection()
+            hi_selection = QtWidgets.QTextEdit.ExtraSelection()
  
             hi_selection.format.setBackground(self.palette().alternateBase())
             hi_selection.format.setProperty(QtGui.QTextFormat.FullWidthSelection, 1) #QtCore.QVariant(True)
@@ -154,14 +178,14 @@ class LNTextEdit(QtGui.QFrame):
             painter.end()
  
     def __init__(self, *args):
-        QtGui.QFrame.__init__(self, *args)
+        QtWidgets.QFrame.__init__(self, *args)
  
-        self.setFrameStyle(QtGui.QFrame.StyledPanel | QtGui.QFrame.Sunken)
+        self.setFrameStyle(QtWidgets.QFrame.StyledPanel | QtWidgets.QFrame.Sunken)
  
         self.edit = self.PlainTextEdit()
         self.number_bar = self.NumberBar(self.edit)
  
-        hbox = QtGui.QHBoxLayout(self)
+        hbox = QtWidgets.QHBoxLayout(self)
         hbox.setSpacing(0)
         hbox.setContentsMargins(0,0,0,0) # setMargin
         hbox.addWidget(self.number_bar)
@@ -191,14 +215,14 @@ class LNTextEdit(QtGui.QFrame):
         self.edit.setLineWrapMode(mode)
     def setWrap(self, state):
         if state == 0:
-            self.edit.setLineWrapMode(QtGui.QPlainTextEdit.NoWrap)
+            self.edit.setLineWrapMode(QtWidgets.QPlainTextEdit.NoWrap)
         else:
-            self.edit.setLineWrapMode(QtGui.QPlainTextEdit.WidgetWidth)
+            self.edit.setLineWrapMode(QtWidgets.QPlainTextEdit.WidgetWidth)
     def setReadOnly(self, state):
         self.edit.setReadOnly(state)
     def setReadOnlyStyle(self, state):
         if state == 1:
-            mainWindowBgColor = QtGui.QPalette().color(QtGui.QPalette.Window)
+            mainWindowBgColor = QtWidgets.QPalette().color(QtWidgets.QPalette.Window)
             self.setStyleSheet('QPlainTextEdit[readOnly="true"] { background-color: %s;} QFrame {border: 0px}' % mainWindowBgColor.name() )
             self.setHighlight(0)
         else:
