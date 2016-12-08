@@ -176,22 +176,23 @@ display_textEdit.setZoom(1) # enable text zoom feature
 ```
 
 **feature list**
-version 4.0: (2016.12.08)
-  * python 3 support
-  * pyside, pyside2, pyqt4, pyqt5 support
-version 3.2: (2016.09.01)
-  * add get/set/resetFontSize function
-  * support ctrl+mouse wheel zoom in out text area, need to setZoom(1)
-version 3.1:
-  * (v3.1.2) add unicode support for file url
-  * add multiple files drop as path text input
-  * add insertText function
-version 3.0:
-  * support drag and drop file or file url as url text
-  * support setReadOnly and setReadOnlyStyle function
-  * support setWrap() quick function
-  * support text() function
-  * better and clear code for PyQt4 and PySide
+
+  * version 4.0: (2016.12.08)
+    * python 3 support
+    * pyside, pyside2, pyqt4, pyqt5 support
+  * version 3.2: (2016.09.01)
+    * add get/set/resetFontSize function
+    * support ctrl+mouse wheel zoom in out text area, need to setZoom(1)
+  * version 3.1:
+    * (v3.1.2) add unicode support for file url
+    * add multiple files drop as path text input
+    * add insertText function
+  * version 3.0:
+    * support drag and drop file or file url as url text
+    * support setReadOnly and setReadOnlyStyle function
+    * support setWrap() quick function
+    * support text() function
+    * better and clear code for PyQt4 and PySide
   
 #UITranslator.py
 
