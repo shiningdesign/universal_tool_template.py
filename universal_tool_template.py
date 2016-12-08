@@ -1,8 +1,16 @@
 '''
-Univeral Tool Template v007
-by ying - http://shining-lucy.com/wiki
+Univeral Tool Template v008
+by ying - https://github.com/shiningdesign/universal_tool_template.py
 
 log:
+v008: 2016.12.08:
+  * add python 3 support
+  * compatible with Maya 2014 (pyside), Maya 2017 (pyside2), nuke 10 (pyside), houdini 15 (pyside), blender 2.7.8(pyqt5), desktop (pyqt4)
+  * clean up code
+v007.4: 2016.11.15
+  * disable drag move by default
+  * add auto text input valid and input related get function
+  * add more custom option for default_action() for buttons
 v007.3: 2016.10.13
   * add functions for convert between Maya built-in UI creation and Qt Widget Object, 
   * Qt use object pointer reference, Maya use object name
@@ -35,62 +43,127 @@ v005: 2016.07.30
 - add translation and stype function, better grid layout
 v004: 2016.07.28
 v003: 2016.07.22
-
-usage in maya: 
-import TMP_UniversalToolUI_TND
-TMP_UniversalToolUI_TND.main()
-
-usage in commandline:
-python TMP_UniversalToolUI_TND.py
 '''
-tpl_ver = 7.3
-deskMode = 0
+#------------------------------
+# How to Use: 
+# 1. global replace "UniversalToolUI" to "YourToolName" in your editor
+# 2. change file name "universal_tool_template.py" to "YourPreferedFileName.py"
+# 3. load it up and run
+#------------------------------
+# loading template - Run in python panel
+'''
+import sys;myPath='/path_to_universal_tool_or_custom_name/';myPath in sys.path or sys.path.append(myPath);
+import universal_tool_template
+universal_tool_template.main()
+'''
+# loading template - Run in system command console
+'''
+python universal_tool_template.py
+'''
+
+tpl_ver = 8.0
+hostMode = ""
 qtMode = 0 # 0: PySide; 1 : PyQt
+qtModeList = ("PySide", "PyQt4", "PySide2", "PyQt5")
+
+# python 2,3 support unicode function
 try:
+    UNICODE_EXISTS = bool(type(unicode))
+except NameError:
+    unicode = lambda s: str(s)
+
+# ==== auto hostMode detect ====
+# ref: https://github.com/fredrikaverpil/pyvfx-boilerplate/blob/master/boilerplate.py
+
+try:
+    # maya detection
     import maya.OpenMayaUI as mui
+    import maya.cmds as cmds
+    hostMode = "maya"
 except ImportError:
-    deskMode = 1
-
-# ==== for PyQt4 ====
-#from PyQt4 import QtGui,QtCore
-#import sip
-
-# ==== for pyside ====
-#from PySide import QtGui,QtCore
-#import shiboken
-
-# ==== auto Qt load ====
-try:
-    from PySide import QtGui,QtCore
-    import shiboken
-    qtMode = 0
-except ImportError:
-    from PyQt4 import QtGui,QtCore
-    import sip
-    qtMode = 1
+    # houdini detection
+    try:
+        import hou 
+        hostMode = "houdini"
+    except ImportError:
+        # nuke detection
+        try:
+            import nuke
+            import nukescripts
+            hostMode = "nuke"
+        except ImportError:
+            # blender detection
+            try:
+                import bpy 
+                hostMode = "blender"
+            except ImportError:
+                hostMode = "desktop"
+print("Host: {}".format(hostMode))
     
-from functools import partial
+# ==== auto QtMode detection ====
+# ref: https://github.com/mottosso/Qt.py
+try:
+    from PySide import QtGui, QtCore
+    import PySide.QtGui as QtWidgets
+    print("PySide Try")
+    qtMode = 0
+    if hostMode == "maya":
+        import shiboken
+except ImportError:
+    try:
+        from PySide2 import QtCore, QtGui, QtWidgets
+        print("PySide2 Try")
+        qtMode = 2
+        if hostMode == "maya":
+            import shiboken2 as shiboken
+    except ImportError:
+        try:
+            from PyQt4 import QtGui,QtCore
+            import PyQt4.QtGui as QtWidgets
+            #if hostMode == "maya":
+            import sip
+            qtMode = 1
+            print("PyQt4 Try")
+        except ImportError:
+            from PyQt5 import QtGui,QtCore,QtWidgets
+            #if hostMode == "maya":
+            import sip
+            qtMode = 3
+            print("PyQt5 Try")
+
+# ==== auto PyMode detection ====
 import sys
+pyMode = '.'.join([ str(n) for n in sys.version_info[:3] ])
+print("Python: {}".format(pyMode))
 
-########################################
+# ==== template module list ====
+import os # for path and language code
+from functools import partial # for partial function creation
 
+# ================
+#  user module list
+# ================
 
 import LNTextEdit # for text edit code
-import json # for file operation code
-import os # for language code
 
-# note: if you want to create a window with menu, then use QMainWindow Class
-class TMP_UniversalToolUI_TND(QtGui.QMainWindow):
-#class TMP_UniversalToolUI_TND(QtGui.QDialog):
+#------------------------------
+# user UI class choice
+#------------------------------
+super_class = QtWidgets.QMainWindow # note: only one supports menu
+#super_class = QtWidgets.QDialog
+#super_class = QtWidgets.QWidget
+
+class UniversalToolUI(super_class): 
     def __init__(self, parent=None, mode=0):
-        QtGui.QMainWindow.__init__(self, parent)
-        #QtGui.QDialog.__init__(self, parent)
-        
+        super_class.__init__(self, parent)
+        #------------------------------
+        # class variables
+        #------------------------------
         self.version="0.1"
         self.uiList={} # for ui obj storage
         self.memoData = {} # key based variable data storage
         
-        self.fileType='.TMP_UniversalToolUI_TND_EXT'
+        self.fileType='.UniversalToolUI_EXT'
         # mode: example for receive extra user input as parameter
         self.mode = 0
         if mode in [0,1]:
@@ -103,26 +176,25 @@ class TMP_UniversalToolUI_TND(QtGui.QMainWindow):
         else:
             # unfrozen
             self.location = os.path.realpath(__file__) # location: ref: sys.modules[__name__].__file__
-        
-        #~~~~~~~~~~~~~~~~~~
+        #------------------------------
         # initial data
-        #~~~~~~~~~~~~~~~~~~
+        #------------------------------
         self.memoData['data']=[]
         
         self.setupStyle()
-        self.setupMenu() # only if you use QMainWindows Class
+        if isinstance(self, QtWidgets.QMainWindow):
+            self.setupMenu() # only if you use QMainWindows Class
         self.setupWin()
         self.setupUI()
         self.Establish_Connections()
         self.loadData()
         self.loadLang()
-        
+    
     def setupStyle(self):
         # global app style setting for desktop
-        if deskMode == 1:
-            QtGui.QApplication.setStyle(QtGui.QStyleFactory.create('Cleanlooks'))
+        if hostMode == "desktop":
+            QtWidgets.QApplication.setStyle(QtWidgets.QStyleFactory.create('Cleanlooks'))
         self.setStyleSheet("QLineEdit:disabled{background-color: gray;}")
-            
     def setupMenu(self):
         self.quickMenu(['file_menu;&File','setting_menu;&Setting','help_menu;&Help'])
         cur_menu = self.uiList['setting_menu']
@@ -131,30 +203,58 @@ class TMP_UniversalToolUI_TND(QtGui.QMainWindow):
         cur_menu.addSeparator()
         # for info review
         cur_menu = self.uiList['help_menu']
-        self.quickMenuAction('helpDeskMode_atnNone','Desk Mode - {}'.format(deskMode),'Desktop Running Mode - 0: Maya Mode; 1: Desktop Mode.','', cur_menu)
-        self.quickMenuAction('helpQtMode_atnNone','PyQt4 Mode - {}'.format(qtMode),'Qt Library - 0: PySide; 1: PyQt4.','', cur_menu)
-        self.quickMenuAction('helpTemplate_atnNone','Universal Tool Teamplate - {}'.format(tpl_ver),'based on Univeral Tool Template v7 by Shining Ying - http://shining-lucy.com','', cur_menu)
+        self.quickMenuAction('helpHostMode_atnNone','Host Mode - {}'.format(hostMode),'Host Running.','', cur_menu)
+        self.quickMenuAction('helpPyMode_atnNone','Python Mode - {}'.format(pyMode),'Python Library Running.','', cur_menu)
+        self.quickMenuAction('helpQtMode_atnNone','Qt Mode - {}'.format(qtModeList[qtMode]),'Qt Library Running.','', cur_menu)
+        self.quickMenuAction('helpTemplate_atnNone','Universal Tool Teamplate - {}'.format(tpl_ver),'based on Univeral Tool Template v7 by Shining Ying - https://github.com/shiningdesign/universal_tool_template.py','', cur_menu)
         cur_menu.addSeparator()
         self.uiList['helpGuide_msg'] = "How to Use:\n1. Put source info in\n2. Click Process button\n3. Check result output\n4. Save memory info into a file."
         self.quickMenuAction('helpGuide_atnMsg','Usage Guide','How to Usge Guide.','helpGuide.png', cur_menu)
         
     def setupWin(self):
-        self.setWindowTitle("TMP_UniversalToolUI_TND" + " - v" + self.version) 
-        self.setGeometry(300, 300, 800, 600)
-        # win icon setup
-        path = os.path.join(os.path.dirname(self.location),'icons','TMP_UniversalToolUI_TND.png')
+        self.setWindowTitle("UniversalToolUI" + " - v" + self.version + " - host: " + hostMode)
+        self.setGeometry(500, 300, 250, 110) # self.resize(250,250)
+        
+        #------------------------------
+        # auto window icon setup
+        path = os.path.join(os.path.dirname(self.location),'icons','UniversalToolUI.png')
         self.setWindowIcon(QtGui.QIcon(path))
+        
+        #------------------------------
         # initial win drag position
         self.drag_position=QtGui.QCursor.pos()
-        #self.resize(250,250)
-        # - for frameless or always on top option
-        #self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint) # it will keep ui always on top of desktop, but to set this in Maya, dont set Maya as its parent
-        #self.setWindowFlags(QtCore.Qt.FramelessWindowHint) # it will hide ui border frame, but in Maya, use QDialog instead as QMainWindow will disappear
-        #self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint) # best for Maya case with QDialog without parent, for always top frameless ui
-        # - for transparent and non-regular shape ui
-        #self.setAttribute(QtCore.Qt.WA_TranslucentBackground) # use it if you set main ui to transparent and want to use alpha png as irregular shape window
-        #self.setStyleSheet("background-color: rgba(0, 0, 0,0);") # black color better white color for get better look of semi trans edge, like pre-mutiply
-    
+        
+        #------------------------------
+        # template list: for frameless or always on top option
+        #------------------------------
+        # - template : keep ui always on top of all;
+        # While in Maya, dont set Maya as its parent
+        '''
+        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint) 
+        '''
+        
+        # - template: hide ui border frame; 
+        # While in Maya, use QDialog instead, as QMainWindow will make it disappear
+        '''
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        '''
+        
+        # - template: best solution for Maya QDialog without parent, for always on-Top frameless ui
+        '''
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint)
+        '''
+        
+        # - template: for transparent and non-regular shape ui
+        # note: use it if you set main ui to transparent, and want to use alpha png as irregular shape window
+        # note: black color better than white for better look of semi trans edge, like pre-mutiply
+        '''
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setStyleSheet("background-color: rgba(0, 0, 0,0);")
+        '''
+        
+    #############################################
+    # customized SUPER quick ui function for speed up programming
+    #############################################
     def qui(self, ui_list_string, parentObject_string='', opt=''):
         # pre-defined user short name syntax
         type_dict = {
@@ -195,22 +295,34 @@ class TMP_UniversalToolUI_TND(QtGui.QMainWindow):
         self.quickUI(ui_list, parentObject, opt)
         
     def setupUI(self):
-        #==============================
-        
-        # main_layout for QMainWindow
-        main_widget = QtGui.QWidget()
-        self.setCentralWidget(main_widget)        
-        main_layout = self.quickLayout('vbox', 'main_layout') # grid for auto fill window size
-        main_widget.setLayout(main_layout)
-        '''
-        # main_layout for QDialog
-        main_layout = self.quickLayout('vbox', 'main_layout')
-        self.setLayout(main_layout)
-        '''
-        
         #------------------------------
-        # ui element creation part
-        # quickUI version from universal tool template v6
+        # main_layout auto creation for holding all the UI elements
+        #------------------------------
+        main_layout = None
+        if isinstance(self, QtWidgets.QMainWindow):
+            main_widget = QtWidgets.QWidget()
+            self.setCentralWidget(main_widget)        
+            main_layout = self.quickLayout('vbox', 'main_layout') # grid for auto fill window size
+            main_widget.setLayout(main_layout)
+        else:
+            # main_layout for QDialog
+            main_layout = self.quickLayout('vbox', 'main_layout')
+            self.setLayout(main_layout)
+
+        #------------------------------
+        # user ui creation part
+        #------------------------------
+        # + template: qui version since universal tool template v7
+        #   - no extra variable name, all text based creation and reference
+        
+        self.qui('source_txtEdit | process_btn;Process and Update', 'upper_vbox')
+        self.qui('upper_vbox | result_txtEdit', 'input_split;v')
+        self.qui('filePath_input | fileLoad_btn;Load | fileExport_btn;Export', 'fileBtn_layout;hbox')
+        self.qui('input_split | fileBtn_layout', 'main_layout')
+        self.uiList["source_txtEdit"].setWrap(0)
+        self.uiList["result_txtEdit"].setWrap(0)
+        
+        # - template : quickUI version since universal tool template v6
         '''
         upper_layout = self.quickUI(["source_txtEdit;LNTextEdit","process_btn;QPushButton;Process and Update"],"upper_QVBoxLayout")
         upper_layout.setContentsMargins(0,0,0,0)
@@ -221,59 +333,53 @@ class TMP_UniversalToolUI_TND(QtGui.QMainWindow):
         self.uiList["source_txtEdit"].setWrap(0)
         self.uiList["result_txtEdit"].setWrap(0)
         '''
-
-        #------------------------------
-        # qui version from template 7
-        # no extra variable name, all text based creation and reference
-
-        self.qui('source_txtEdit | process_btn;Process and Update', 'upper_vbox')
-        self.qui('upper_vbox | result_txtEdit', 'input_split;v')
-        self.qui('filePath_input | fileLoad_btn;Load | fileExport_btn;Export', 'fileBtn_layout;hbox')
-        self.qui('input_split | fileBtn_layout', 'main_layout')
-        self.uiList["source_txtEdit"].setWrap(0)
-        self.uiList["result_txtEdit"].setWrap(0)        
         
+        # - template : invisible but functional button
         '''
-        self.uiList['secret_btn'] = QtGui.QPushButton(self) # invisible but functional button
+        self.uiList['secret_btn'] = QtWidgets.QPushButton(self) 
         self.uiList['secret_btn'].setText("")
         self.uiList['secret_btn'].setGeometry(0, 0, 50, 20)
         self.uiList['secret_btn'].setStyleSheet("QPushButton{background-color: rgba(0, 0, 0,0);} QPushButton:pressed{background-color: rgba(0, 0, 0,0); border: 0px;} QPushButton:hover{background-color: rgba(0, 0, 0,0); border: 0px;}")
         #:hover:pressed:focus:hover:disabled
         '''
+        
         #------------- end ui creation --------------------
         for name,each in self.uiList.items():
-            if isinstance(each, QtGui.QLayout) and name!='main_layout' and not name.endswith('_grp_layout'):
-                each.setContentsMargins(0,0,0,0)
-        self.quickInfo('Ready')
-
+            if isinstance(each, QtWidgets.QLayout) and name!='main_layout' and not name.endswith('_grp_layout'):
+                each.setContentsMargins(0,0,0,0) # clear extra margin some nested layout
+        #self.quickInfo('Ready')
+        
     def Establish_Connections(self):
-        # loop button and menu action to link to functions
         for ui_name in self.uiList.keys():
             if ui_name.endswith('_btn'):
-                QtCore.QObject.connect(self.uiList[ui_name], QtCore.SIGNAL("clicked()"), getattr(self, ui_name[:-4]+"_action", partial(self.default_action,ui_name)))
+                self.uiList[ui_name].clicked.connect(getattr(self, ui_name[:-4]+"_action", partial(self.default_action,ui_name)))
             elif ui_name.endswith('_atn'):
-                QtCore.QObject.connect(self.uiList[ui_name], QtCore.SIGNAL("triggered()"), getattr(self, ui_name[:-4]+"_action", partial(self.default_action,ui_name)))
+                self.uiList[ui_name].triggered.connect(getattr(self, ui_name[:-4]+"_action", partial(self.default_action,ui_name)))
             elif ui_name.endswith('_btnMsg'):
-                QtCore.QObject.connect(self.uiList[ui_name], QtCore.SIGNAL("clicked()"), getattr(self, ui_name[:-7]+"_message", partial(self.default_message,ui_name)))
+                self.uiList[ui_name].clicked.connect(getattr(self, ui_name[:-7]+"_message", partial(self.default_message,ui_name)))
             elif ui_name.endswith('_atnMsg'):
-                QtCore.QObject.connect(self.uiList[ui_name], QtCore.SIGNAL("triggered()"), getattr(self, ui_name[:-7]+"_message", partial(self.default_message,ui_name)))
-        # custom connection
-    
+                self.uiList[ui_name].triggered.connect(getattr(self, ui_name[:-4]+"_action", partial(self.default_message,ui_name)))
+                
     #=======================================
     # UI Response functions (custom + prebuilt functions)
     #=======================================
-    #-- ui actions
+    # ==== user response list ====
     def loadData(self):
-        print("Load data")
-    def quickInfo(self, info):
-        self.statusBar().showMessage(info)
+        print("Load data")   
         
     def process_action(self): # (optional)
         print("Process ....")
         self.source_ui_to_memory()
         print("Update Result")
         self.memory_to_result_ui()
-        
+    
+    # - example functions
+    def font_action(self):
+        font, ok = QtWidgets.QFontDialog.getFont()
+        if ok:
+            self.uiList['font_label'].setFont(font)
+    
+    # ==== template response list ====
     def default_action(self, ui_name):
         print("No action defined for this button: "+ui_name)
     def default_message(self, ui_name):
@@ -281,12 +387,22 @@ class TMP_UniversalToolUI_TND(QtGui.QMainWindow):
         msg_txt = msgName + " is not defined in uiList."
         if msgName in self.uiList:
             msg_txt = self.uiList[msgName]
-        tmpMsg = QtGui.QMessageBox()
+        tmpMsg = QtWidgets.QMessageBox()
         tmpMsg.setWindowTitle("Info")
         tmpMsg.setText(msg_txt)
-        tmpMsg.addButton("OK",QtGui.QMessageBox.YesRole)
+        tmpMsg.addButton("OK",QtWidgets.QMessageBox.YesRole)
         tmpMsg.exec_()
-    
+    '''
+    # maya related custom default button input function
+    def default_action(self, ui_name):
+        if ui_name.endswith('_input_set_btn'):
+            input_ui = ui_name.replace('_input_set_btn', '_input')
+            selected = cmds.ls(sl=1)
+            if len(selected)>0 and input_ui in self.uiList.keys():
+                self.uiList[input_ui].setText(selected[0])
+        else:
+            print("No action defined for this button: "+ui_name)    
+    '''
     #=======================================
     #- UI and RAM content update functions (optional)
     #=======================================
@@ -317,7 +433,7 @@ class TMP_UniversalToolUI_TND(QtGui.QMainWindow):
         file=str(self.uiList['filePath_input'].text())
         # open file dialog if no text input for file path
         if file == "":
-            file = QtGui.QFileDialog.getSaveFileName(self, "Save File","","RAW data (*.json);;Format Txt(*{});;AllFiles(*.*)".format(self.fileType))
+            file = QtWidgets.QFileDialog.getSaveFileName(self, "Save File","","RAW data (*.json);;Format Txt(*{});;AllFiles(*.*)".format(self.fileType))
             if isinstance(file, (list, tuple)): # for deal with pyside case
                 file = file[0]
             else:
@@ -335,7 +451,7 @@ class TMP_UniversalToolUI_TND(QtGui.QMainWindow):
         file=str(self.uiList['filePath_input'].text())
         # open file dialog if no text input for file path
         if file == "":
-            file = QtGui.QFileDialog.getOpenFileName(self, "Open File","","RAW data (*.json);;Format Txt(*{});;AllFiles(*.*)".format(self.fileType))
+            file = QtWidgets.QFileDialog.getOpenFileName(self, "Open File","","RAW data (*.json);;Format Txt(*{});;AllFiles(*.*)".format(self.fileType))
             if isinstance(file, (list, tuple)): # for deal with pyside case
                 file = file[0]
             else:
@@ -362,8 +478,81 @@ class TMP_UniversalToolUI_TND(QtGui.QMainWindow):
     #############################################################
     #############################################################
     # ----------------- CORE TEMPLATE FUNCTIONS -----------------
+    #                 note: dont touch code below               #
     #############################################################
-    # dont touch code below
+    
+    #############################################
+    # ui data fetch functions
+    #############################################
+    # valid input functions
+    # maya obj related
+    '''
+    def valid_input_newObj(self, input_name, name_format, msg=None):
+        name = self.valid_input_str(input_name, msg=msg)
+        if name == None:
+            return None
+        elif cmds.objExists(name_format.format(name)):
+            print("{0} object already exists in the scene".format(name_format.format(name)))
+            return None
+        return name
+    def valid_input_obj(self, input_name, msg=None):
+        obj = str(self.uiList[input_name].text())
+        if not cmds.objExists(obj):
+            print("Please define the existing object. {0}".format(msg))
+            return None
+        return obj
+    '''
+    def valid_input_str(self, input_name, msg=None):
+        name = str(self.uiList[input_name].text())
+        if name == '':
+            print("Please define the name. {0}".format(msg))
+            return None
+        return name
+    def valid_input_int(self, input_name, min=None, max=None, msg=None):
+        input_txt = str(self.uiList[input_name].text())
+        result = None
+        # int valid
+        if not input_txt.isdigit():
+            print("Please enter a valid int. {0}".format(msg))
+            return None
+        result = int(input_txt)
+        # min
+        if min != None:
+            if result < min:
+                print("Please enter a valid int number >= {0}. {1}".format(min, msg))
+                return None
+        # max
+        if max != None:
+            if result > max:
+                print("Please enter a valid int number <= {0}. {1}".format(max, msg))
+                return None
+        return result
+    def valid_input_float(self, input_name, min=None, max=None, msg=None):
+        input_txt = str(self.uiList[input_name].text())
+        result = None
+        try:
+            result = float(input_txt)
+        except (ValueError, TypeError):
+            return None
+        # min
+        if min != None:
+            if result < min:
+                print("Please enter a valid int number >= {0}. {1}".format(min, msg))
+                return None
+        # max
+        if max != None:
+            if result > max:
+                print("Please enter a valid int number <= {0}. {1}".format(max, msg))
+                return None
+        return result
+    def input_choice(self, ui_name):
+        if ui_name in self.uiList.keys():
+            return self.uiList[ui_name].currentIndex()
+        else:
+            return None 
+    def output_text(self, ui_name, text):
+        if ui_name in self.uiList.keys():
+            self.uiList[ui_name].setText(text)
     #############################################
     # json and text data functions
     #############################################
@@ -387,11 +576,12 @@ class TMP_UniversalToolUI_TND(QtGui.QMainWindow):
     # UI and Mouse Interaction functions
     #############################################
     def contextMenuEvent(self, event):
-        menu = QtGui.QMenu(self)
+        menu = QtWidgets.QMenu(self)
         quitAction = menu.addAction("Quit")
         action = menu.exec_(self.mapToGlobal(event.pos()))
         if action == quitAction:
             self.close()
+    '''
     def mouseMoveEvent(self, event):
         if (event.buttons() == QtCore.Qt.LeftButton):
             self.move(event.globalPos().x() - self.drag_position.x(),
@@ -401,6 +591,7 @@ class TMP_UniversalToolUI_TND(QtGui.QMainWindow):
         if (event.button() == QtCore.Qt.LeftButton):
             self.drag_position = event.globalPos() - self.pos()
         event.accept()
+    '''
     #############################################
     # UI language functions
     #############################################
@@ -409,19 +600,19 @@ class TMP_UniversalToolUI_TND(QtGui.QMainWindow):
         cur_menu = self.uiList['language_menu']
         self.quickMenuAction('langDefault_atnLang', 'Default','','langDefault.png', cur_menu)
         cur_menu.addSeparator()
-        QtCore.QObject.connect( self.uiList['langDefault_atnLang'], QtCore.SIGNAL("triggered()"), partial(self.setLang, 'default') )
+        self.uiList['langDefault_atnLang'].triggered.connect(partial(self.setLang,'default'))
         # store default language
         self.memoData['lang']={}
         self.memoData['lang']['default']={}
         for ui_name in self.uiList:
             ui_element = self.uiList[ui_name]
-            if type(ui_element) in [ QtGui.QLabel, QtGui.QPushButton, QtGui.QAction, QtGui.QCheckBox ]:
+            if type(ui_element) in [ QtWidgets.QLabel, QtWidgets.QPushButton, QtWidgets.QAction, QtWidgets.QCheckBox ]:
                 # uiType: QLabel, QPushButton, QAction(menuItem), QCheckBox
                 self.memoData['lang']['default'][ui_name] = str(ui_element.text())
-            elif type(ui_element) in [ QtGui.QGroupBox, QtGui.QMenu ]:
+            elif type(ui_element) in [ QtWidgets.QGroupBox, QtWidgets.QMenu ]:
                 # uiType: QMenu, QGroupBox
                 self.memoData['lang']['default'][ui_name] = str(ui_element.title())
-            elif type(ui_element) in [ QtGui.QTabWidget]:
+            elif type(ui_element) in [ QtWidgets.QTabWidget]:
                 # uiType: QTabWidget
                 tabCnt = ui_element.count()
                 tabNameList = []
@@ -440,24 +631,24 @@ class TMP_UniversalToolUI_TND(QtGui.QMainWindow):
                 langName = fileName.replace(baseName+"_lang_","").split('.')[0].replace(" ","")
                 self.memoData['lang'][ langName ] = self.readRawFile( os.path.join(lang_path,fileName) )
                 self.quickMenuAction(langName+'_atnLang', langName.upper(),'',langName + '.png', cur_menu)
-                QtCore.QObject.connect( self.uiList[langName+'_atnLang'], QtCore.SIGNAL("triggered()"), partial(self.setLang, langName) )
+                self.uiList[langName+'_atnLang'].triggered.connect(partial(self.setLang,langName))
         # if no language file detected, add export default language option
         if len(self.memoData['lang']) == 1:
             self.quickMenuAction('langExport_atnLang', 'Export Default Language','','langExport.png', cur_menu)
-            QtCore.QObject.connect( self.uiList['langExport_atnLang'], QtCore.SIGNAL("triggered()"), self.exportLang )
+            self.uiList['langExport_atnLang'].triggered.connect(self.exportLang)
     def setLang(self, langName):
         uiList_lang_read = self.memoData['lang'][langName]
         for ui_name in uiList_lang_read:
             ui_element = self.uiList[ui_name]
-            if type(ui_element) in [ QtGui.QLabel, QtGui.QPushButton, QtGui.QAction, QtGui.QCheckBox ]:
+            if type(ui_element) in [ QtWidgets.QLabel, QtWidgets.QPushButton, QtWidgets.QAction, QtWidgets.QCheckBox ]:
                 # uiType: QLabel, QPushButton, QAction(menuItem), QCheckBox
                 if uiList_lang_read[ui_name] != "":
                     ui_element.setText(uiList_lang_read[ui_name])
-            elif type(ui_element) in [ QtGui.QGroupBox, QtGui.QMenu ]:
+            elif type(ui_element) in [ QtWidgets.QGroupBox, QtWidgets.QMenu ]:
                 # uiType: QMenu, QGroupBox
                 if uiList_lang_read[ui_name] != "":
                     ui_element.setTitle(uiList_lang_read[ui_name])
-            elif type(ui_element) in [ QtGui.QTabWidget]:
+            elif type(ui_element) in [ QtWidgets.QTabWidget]:
                 # uiType: QTabWidget
                 tabCnt = ui_element.count()
                 if uiList_lang_read[ui_name] != "":
@@ -471,7 +662,7 @@ class TMP_UniversalToolUI_TND(QtGui.QMainWindow):
                 if uiList_lang_read[ui_name] != "":
                     self.uiList[ui_name] = uiList_lang_read[ui_name]
     def exportLang(self):
-        file = QtGui.QFileDialog.getSaveFileName(self, "Export Default UI Language File","","RAW data (*.json);;AllFiles(*.*)")
+        file = QtWidgets.QFileDialog.getSaveFileName(self, "Export Default UI Language File","","RAW data (*.json);;AllFiles(*.*)")
         if isinstance(file, (list, tuple)): # for deal with pyside case
             file = file[0]
         else:
@@ -484,22 +675,40 @@ class TMP_UniversalToolUI_TND(QtGui.QMainWindow):
     # quick ui function for speed up programming
     #############################################
     def quickMenu(self, ui_names):
-        if isinstance(self, QtGui.QMainWindow):
+        if isinstance(self, QtWidgets.QMainWindow):
             menubar = self.menuBar()
             for each_ui in ui_names:
                 createOpt = each_ui.split(';')
                 if len(createOpt) > 1:
                     uiName = createOpt[0]
                     uiLabel = createOpt[1]
-                    self.uiList[uiName] = QtGui.QMenu(uiLabel)
+                    self.uiList[uiName] = QtWidgets.QMenu(uiLabel)
                     menubar.addMenu(self.uiList[uiName])
         else:
             print("Warning (QuickMenu): Only QMainWindow can have menu bar.")
         
     def quickMenuAction(self, objName, title, tip, icon, menuObj):
-        self.uiList[objName] = QtGui.QAction(QtGui.QIcon(icon), title, self)        
+        self.uiList[objName] = QtWidgets.QAction(QtGui.QIcon(icon), title, self)        
         self.uiList[objName].setStatusTip(tip)
         menuObj.addAction(self.uiList[objName])
+    
+    def quickLayout(self, type, ui_name=""):
+        the_layout = ''
+        if type in ("form", "QFormLayout"):
+            the_layout = QtWidgets.QFormLayout()
+            the_layout.setLabelAlignment(QtCore.Qt.AlignLeft)
+            the_layout.setFieldGrowthPolicy(QtWidgets.QFormLayout.AllNonFixedFieldsGrow)    
+        elif type in ("grid", "QGridLayout"):
+            the_layout = QtWidgets.QGridLayout()
+        elif type in ("hbox", "QHBoxLayout"):
+            the_layout = QtWidgets.QHBoxLayout()
+            the_layout.setAlignment(QtCore.Qt.AlignTop)
+        else:        
+            the_layout = QtWidgets.QVBoxLayout()
+            the_layout.setAlignment(QtCore.Qt.AlignTop)
+        if ui_name != "":
+            self.uiList[ui_name] = the_layout
+        return the_layout
     
     def quickUI(self, part_list, parentObject="", insert_opt=""):
         # part_list contains: 
@@ -536,7 +745,7 @@ class TMP_UniversalToolUI_TND(QtGui.QMainWindow):
                 uiArgs = partInfo[2] if len(partInfo) > 2 else ""
                 # - string : valid info
                 if uiType == "":
-                    print uiType
+                    print(uiType)
                     print("Warning (QuickUI): uiType is empty for "+each_part)
                 else:
                     # - string : to object creation
@@ -559,12 +768,12 @@ class TMP_UniversalToolUI_TND(QtGui.QMainWindow):
                                 split_type = QtCore.Qt.Horizontal
                                 if uiArgs == 'v':
                                     split_type = QtCore.Qt.Vertical
-                                self.uiList[uiName]=QtGui.QSplitter(split_type)
+                                self.uiList[uiName]=QtWidgets.QSplitter(split_type)
                                 ui_list.append(self.uiList[uiName])
                                 ui_create_state = 1
                             elif uiType == 'QTabWidget':
                                 # ---- QTabWidget as element, no tab label need for input
-                                self.uiList[uiName]=QtGui.QTabWidget()
+                                self.uiList[uiName]=QtWidgets.QTabWidget()
                                 self.uiList[uiName].setStyleSheet("QTabWidget::tab-bar{alignment:center;}QTabBar::tab { min-width: 100px; }")
                                 ui_list.append(self.uiList[uiName])
                                 ui_create_state = 1
@@ -575,7 +784,7 @@ class TMP_UniversalToolUI_TND(QtGui.QMainWindow):
                                 grp_title = arg_list[1] if len(arg_list)>1 else uiName
                                 # create layout and set grp layout
                                 grp_layout = self.quickLayout(grp_layout, uiName+"_layout" )
-                                self.uiList[uiName] = QtGui.QGroupBox(grp_title)
+                                self.uiList[uiName] = QtWidgets.QGroupBox(grp_title)
                                 self.uiList[uiName].setLayout(grp_layout)
                                 ui_list.append(self.uiList[uiName])
                                 ui_create_state = 1
@@ -583,32 +792,32 @@ class TMP_UniversalToolUI_TND(QtGui.QMainWindow):
                             # --- Qt widget creation
                             if uiArgs == "":
                                 # ---- widget with no uiArgs
-                                self.uiList[uiName] = getattr(QtGui, uiType)()
+                                self.uiList[uiName] = getattr(QtWidgets, uiType)()
                                 ui_list.append(self.uiList[uiName])
                                 ui_create_state = 1
                             else:
                                 # ---- widget with uiArgs
                                 if not ( uiArgs.startswith("(") and uiArgs.endswith(")") ):
                                     # ----- with string arg
-                                    self.uiList[uiName] = getattr(QtGui, uiType)(uiArgs)
+                                    self.uiList[uiName] = getattr(QtWidgets, uiType)(uiArgs)
                                     ui_list.append(self.uiList[uiName])
                                     ui_create_state = 1
                                 else:
                                     # ----- with array arg
                                     arg_list = uiArgs.replace('(','').replace(')','').split(',')
                                     if uiType == 'QComboBox':
-                                        self.uiList[uiName] = QtGui.QComboBox()
+                                        self.uiList[uiName] = QtWidgets.QComboBox()
                                         self.uiList[uiName].addItems(arg_list)
                                         ui_list.append(self.uiList[uiName])
                                         ui_create_state = 1
                                     elif uiType == 'QSpacerItem':
-                                        policyList = ( QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Ignored)
+                                        policyList = ( QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Ignored)
                                         # 0 = fixed; 1 > min; 2 < max; 3 = prefered; 4 = <expanding>; 5 = expanding> Aggresive; 6=4 ignored size input
                                         # factors in fighting for space: horizontalStretch
                                         # extra space: setContentsMargins and setSpacing
                                         # ref: http://www.cnblogs.com/alleyonline/p/4903337.html
                                         arg_list = [ int(x) for x in arg_list ]
-                                        self.uiList[uiName] = QtGui.QSpacerItem(arg_list[0],arg_list[1], policyList[arg_list[2]], policyList[arg_list[3]] )
+                                        self.uiList[uiName] = QtWidgets.QSpacerItem(arg_list[0],arg_list[1], policyList[arg_list[2]], policyList[arg_list[3]] )
                                         ui_list.append(self.uiList[uiName])
                                         ui_create_state = 1
                                     else:
@@ -622,7 +831,7 @@ class TMP_UniversalToolUI_TND(QtGui.QMainWindow):
                     ui_create_state = 0
             else:
                 # 1.2 other part like: object, object list, [object, label object]
-                if isinstance(each_part, (QtGui.QWidget, QtGui.QLayout, QtGui.QSpacerItem)):
+                if isinstance(each_part, (QtWidgets.QWidget, QtWidgets.QLayout, QtWidgets.QSpacerItem)):
                     # - object
                     ui_list.append(each_part)
                     ui_label_list.append('')
@@ -693,11 +902,11 @@ class TMP_UniversalToolUI_TND(QtGui.QMainWindow):
                             split_type = QtCore.Qt.Horizontal
                             if parentArgs == 'v':
                                 split_type = QtCore.Qt.Vertical
-                            self.uiList[parentName]=QtGui.QSplitter(split_type)
+                            self.uiList[parentName]=QtWidgets.QSplitter(split_type)
                             parentObject = self.uiList[parentName]
                         elif parentType in ('QTabWidget', 'tab'):
                             # ---- QTabWidget as element, no tab label need for input
-                            self.uiList[parentName]=QtGui.QTabWidget()
+                            self.uiList[parentName]=QtWidgets.QTabWidget()
                             self.uiList[parentName].setStyleSheet("QTabWidget::tab-bar{alignment:center;}QTabBar::tab { min-width: 100px; }")
                             parentObject = self.uiList[parentName]
                         elif parentType in ('QGroupBox', 'grp'):
@@ -707,26 +916,26 @@ class TMP_UniversalToolUI_TND(QtGui.QMainWindow):
                             grp_title = arg_list[1] if len(arg_list)>1 else parentName
                             # create layout and set grp layout
                             grp_layout = self.quickLayout(grp_layout, parentName+"_layout" )
-                            self.uiList[parentName] = QtGui.QGroupBox(grp_title)
+                            self.uiList[parentName] = QtWidgets.QGroupBox(grp_title)
                             self.uiList[parentName].setLayout(grp_layout)
                             parentObject = self.uiList[parentName]
             
             # 3. get parentLayout inside parentObject
             parentLayout = ''
-            if isinstance(parentObject, QtGui.QLayout):
+            if isinstance(parentObject, QtWidgets.QLayout):
                 parentLayout = parentObject
-            elif isinstance(parentObject, QtGui.QGroupBox):
+            elif isinstance(parentObject, QtWidgets.QGroupBox):
                 parentLayout = parentObject.layout()
             # 3.1 insert part_list into parentLayout for layout and groupbox
-            if isinstance(parentLayout, QtGui.QBoxLayout):
+            if isinstance(parentLayout, QtWidgets.QBoxLayout):
                 for each_ui in ui_list:
-                    if isinstance(each_ui, QtGui.QWidget):
+                    if isinstance(each_ui, QtWidgets.QWidget):
                         parentLayout.addWidget(each_ui)
-                    elif isinstance(each_ui, QtGui.QSpacerItem):
+                    elif isinstance(each_ui, QtWidgets.QSpacerItem):
                         parentLayout.addItem(each_ui)
-                    elif isinstance(each_ui, QtGui.QLayout):
+                    elif isinstance(each_ui, QtWidgets.QLayout):
                         parentLayout.addLayout(each_ui)
-            elif isinstance(parentLayout, QtGui.QGridLayout):
+            elif isinstance(parentLayout, QtWidgets.QGridLayout):
                 # one row/colume operation only
                 insertRow = parentLayout.rowCount()
                 insertCol = parentLayout.columnCount()
@@ -734,35 +943,35 @@ class TMP_UniversalToolUI_TND(QtGui.QMainWindow):
                     each_ui = ui_list[i]
                     x = insertRow if insert_opt=="h" else i
                     y = i if insert_opt=="h" else insertCol
-                    if isinstance(each_ui, QtGui.QWidget):
+                    if isinstance(each_ui, QtWidgets.QWidget):
                         parentLayout.addWidget(each_ui,x,y)
-                    elif isinstance(each_ui, QtGui.QSpacerItem):
+                    elif isinstance(each_ui, QtWidgets.QSpacerItem):
                         parentLayout.addItem(each_ui,x,y)
-                    elif isinstance(each_ui, QtGui.QLayout):
+                    elif isinstance(each_ui, QtWidgets.QLayout):
                         parentLayout.addLayout(each_ui,x,y)
-            elif isinstance(parentLayout, QtGui.QFormLayout):
+            elif isinstance(parentLayout, QtWidgets.QFormLayout):
                 for i in range(len(ui_list)):
                     each_ui = ui_list[i]
-                    if isinstance(each_ui, QtGui.QWidget) or isinstance(each_ui, QtGui.QLayout):
+                    if isinstance(each_ui, QtWidgets.QWidget) or isinstance(each_ui, QtWidgets.QLayout):
                         # create and add label: (uiName, uiLabel)
                         if ui_label_list[i] != '':
                             uiLabelName = ui_label_list[i][0] + "_label"
                             uiLabelText = ui_label_list[i][1]
-                            self.uiList[uiLabelName] = QtGui.QLabel(uiLabelText)
+                            self.uiList[uiLabelName] = QtWidgets.QLabel(uiLabelText)
                             parentLayout.addRow(self.uiList[uiLabelName], each_ui)
                         else:
                             parentLayout.addRow(each_ui)
             else:
                 # 3.2 insert for empty parentLayout for split, and tab
-                if isinstance(parentObject, QtGui.QSplitter):
+                if isinstance(parentObject, QtWidgets.QSplitter):
                     for each_ui in ui_list:
-                        if isinstance(each_ui, QtGui.QWidget):
+                        if isinstance(each_ui, QtWidgets.QWidget):
                             parentObject.addWidget(each_ui)
                         else:
-                            tmp_holder = QtGui.QWidget()
+                            tmp_holder = QtWidgets.QWidget()
                             tmp_holder.setLayout(each_ui)
                             parentObject.addWidget(tmp_holder)
-                elif isinstance(parentObject, QtGui.QTabWidget):
+                elif isinstance(parentObject, QtWidgets.QTabWidget):
                     tab_names = insert_opt.replace('(','').replace(')','').split(',')
                     for i in range( len(ui_list) ):
                         each_tab = ui_list[i]
@@ -770,64 +979,45 @@ class TMP_UniversalToolUI_TND(QtGui.QMainWindow):
                         if i < len(tab_names):
                             if tab_names[i] != '':
                                 each_name = tab_names[i]
-                        if isinstance(each_tab, QtGui.QWidget):
+                        if isinstance(each_tab, QtWidgets.QWidget):
                             parentObject.addTab(each_tab, each_name)
                         else:
-                            tmp_holder = QtGui.QWidget()
+                            tmp_holder = QtWidgets.QWidget()
                             tmp_holder.setLayout(each_tab)
                             parentObject.addTab(tmp_holder, each_name)
             return parentObject
-            
-    def quickLayout(self, type, ui_name=""):
-        the_layout = ''
-        if type in ("form", "QFormLayout"):
-            the_layout = QtGui.QFormLayout()
-            the_layout.setLabelAlignment(QtCore.Qt.AlignLeft)
-            the_layout.setFieldGrowthPolicy(QtGui.QFormLayout.AllNonFixedFieldsGrow)    
-        elif type in ("grid", "QGridLayout"):
-            the_layout = QtGui.QGridLayout()
-        elif type in ("hbox", "QHBoxLayout"):
-            the_layout = QtGui.QHBoxLayout()
-            the_layout.setAlignment(QtCore.Qt.AlignTop)
-        else:        
-            the_layout = QtGui.QVBoxLayout()
-            the_layout.setAlignment(QtCore.Qt.AlignTop)
-        if ui_name != "":
-            self.uiList[ui_name] = the_layout
-        return the_layout
-        
     def quickSplitUI(self, name, part_list, type):
         split_type = QtCore.Qt.Horizontal
         if type == 'v':
             split_type = QtCore.Qt.Vertical
-        self.uiList[name]=QtGui.QSplitter(split_type)
+        self.uiList[name]=QtWidgets.QSplitter(split_type)
         
         for each_part in part_list:
-            if isinstance(each_part, QtGui.QWidget):
+            if isinstance(each_part, QtWidgets.QWidget):
                 self.uiList[name].addWidget(each_part)
             else:
-                tmp_holder = QtGui.QWidget()
+                tmp_holder = QtWidgets.QWidget()
                 tmp_holder.setLayout(each_part)
                 self.uiList[name].addWidget(tmp_holder)
         return self.uiList[name]
         
     def quickTabUI(self, name, tab_list, tab_names):
-        self.uiList[name]=QtGui.QTabWidget()
+        self.uiList[name]=QtWidgets.QTabWidget()
         self.uiList[name].setStyleSheet("QTabWidget::tab-bar{alignment:center;}QTabBar::tab { min-width: 100px; }")
         for i in range( len(tab_list) ):
             each_tab = tab_list[i]
             each_name = tab_names[i]
-            if isinstance(each_tab, QtGui.QWidget):
+            if isinstance(each_tab, QtWidgets.QWidget):
                 self.uiList[name].addTab(each_tab, each_name)
             else:
-                tmp_holder = QtGui.QWidget()
+                tmp_holder = QtWidgets.QWidget()
                 tmp_holder.setLayout(each_tab)
                 self.uiList[name].addTab(tmp_holder, each_name)
         return self.uiList[name]
         
     def quickGrpUI(self, ui_name, ui_label, ui_layout):
-        self.uiList[ui_name] = QtGui.QGroupBox(ui_label)
-        if isinstance(ui_layout, QtGui.QLayout):
+        self.uiList[ui_name] = QtWidgets.QGroupBox(ui_label)
+        if isinstance(ui_layout, QtWidgets.QLayout):
             self.uiList[ui_name].setLayout(ui_layout)
         elif isinstance(ui_layout, str):
             ui_layout = self.quickLayout(ui_name+"_layout", ui_layout)
@@ -838,94 +1028,105 @@ class TMP_UniversalToolUI_TND(QtGui.QMainWindow):
         if not isinstance(ui_list, (list, tuple)):
             ui_list = [ui_list]
         # 0 = fixed; 1 > min; 2 < max; 3 = prefered; 4 = <expanding>; 5 = expanding> Aggresive; 6=4 ignored size input
-        policyList = ( QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Ignored)
+        policyList = ( QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Ignored)
         for each_ui in ui_list:
             if isinstance(each_ui, str):
                 each_ui = self.uiList[each_ui]
             each_ui.setSizePolicy(policyList[w],policyList[h])
-            
+    
+    def quickInfo(self, info):
+        self.statusBar().showMessage(info)            
     def quickMsg(self, msg):
-        tmpMsg = QtGui.QMessageBox() # for simple msg that no need for translation
+        tmpMsg = QtWidgets.QMessageBox() # for simple msg that no need for translation
         tmpMsg.setWindowTitle("Info")
         tmpMsg.setText(msg)
-        tmpMsg.addButton("OK",QtGui.QMessageBox.YesRole)
+        tmpMsg.addButton("OK",QtWidgets.QMessageBox.YesRole)
         tmpMsg.exec_()
     def quickMsgAsk(self, msg):
-        txt, ok = QtGui.QInputDialog.getText(self, "Input", msg)
+        txt, ok = QtWidgets.QInputDialog.getText(self, "Input", msg)
         return (str(txt), ok)
-        
+
     def mui_to_qt(self, mui_name):
+        if hostMode != "maya":
+            return
         ptr = mui.MQtUtil.findControl(mui_name)
         if ptr is None:
             ptr = mui.MQtUtil.findLayout(mui_name)
         if ptr is None:
             ptr = mui.MQtUtil.findMenuItem(mui_name)
         if ptr is not None:
-            if qtMode == 0:
+            if qtMode in (0,2):
                 # ==== for pyside ====
-                return shiboken.wrapInstance(long(ptr), QtGui.QWidget)
-            elif qtMode == 1:
+                return shiboken.wrapInstance(long(ptr), QtWidgets.QWidget)
+            elif qtMode in (1,3):
                 # ==== for PyQt====
                 return sip.wrapinstance(long(ptr), QtCore.QObject)
     def qt_to_mui(self, qt_obj):
+        if hostMode != "maya":
+            return
         ref = None
-        if qtMode == 0:
+        if qtMode in (0,2):
             # ==== for pyside ====
             ref = long(shiboken.getCppPointer(qt_obj)[0])
-        elif qtMode == 1:
+        elif qtMode in (1,3):
             # ==== for PyQt====
             ref = long(sip.unwrapinstance(qt_obj))
         if ref is not None:
             return mui.MQtUtil.fullName(ref)
-            
+
 #############################################
 # window instance creation
 #############################################
-# If you want to be able to Keep only one copy of windows ui in Maya, use code below
-single_TMP_UniversalToolUI_TND = None   
+
+single_UniversalToolUI = None
 def main(mode=0):
+    # get parent window in Maya
     parentWin = None
-    app = None
-    if deskMode == 0:
-        if qtMode == 0:
-            # ==== for pyside ====
-            parentWin = shiboken.wrapInstance(long(mui.MQtUtil.mainWindow()), QtGui.QWidget)
-        elif qtMode == 1:
-            # ==== for PyQt====
+    if hostMode == "maya":
+        if qtMode in (0,2): # pyside
+            parentWin = shiboken.wrapInstance(long(mui.MQtUtil.mainWindow()), QtWidgets.QWidget)
+        elif qtMode in (1,3): # PyQt
             parentWin = sip.wrapinstance(long(mui.MQtUtil.mainWindow()), QtCore.QObject)
-    if deskMode == 1:
-        app = QtGui.QApplication(sys.argv)
+    # create app object for certain host
+    app = None
+    if hostMode in ("desktop", "blender"):
+        app = QtWidgets.QApplication(sys.argv)
     
-    # single UI window code, so no more duplicate window instance when run this function
-    global single_TMP_UniversalToolUI_TND
-    if single_TMP_UniversalToolUI_TND is None:
-        single_TMP_UniversalToolUI_TND = TMP_UniversalToolUI_TND(parentWin, mode) # extra note: in Maya () for no parent; (parentWin,0) for extra mode input
-    single_TMP_UniversalToolUI_TND.show()
+    #--------------------------
+    # ui instance
+    #--------------------------
+    # template 1 - Keep only one copy of windows ui in Maya
+    global single_UniversalToolUI
+    if single_UniversalToolUI is None:
+        if hostMode == "maya":
+            single_UniversalToolUI = UniversalToolUI(parentWin, mode)
+        else:
+            single_UniversalToolUI = UniversalToolUI()
+        # extra note: in Maya () for no parent; (parentWin,0) for extra mode input
+    single_UniversalToolUI.show()
+    ui = single_UniversalToolUI
     
-    if deskMode == 1:
+    # template 2 - allow loading multiple windows of same UI in Maya
+    '''
+    if hostMode == "maya":
+        ui = UniversalToolUI(parentWin)
+        ui.show()
+    else:
+        
+    # extra note: in Maya () for no parent; (parentWin,0) for extra mode input
+    
+    '''
+    
+    # loop app object for certain host
+    if hostMode in ("desktop"):
         sys.exit(app.exec_())
     
-    # example: show ui stored
-    # print(single_TMP_UniversalToolUI_TND.uiList.keys())
-    return single_TMP_UniversalToolUI_TND
-    
-# If you want to be able to load multiple windows of the same ui in Maya, use code below
-'''
-def main(mode=0):
-    parentWin = None
-    if deskMode == 0:
-        if qtMode == 0:
-            # ==== for pyside ====
-            parentWin = shiboken.wrapInstance(long(mui.MQtUtil.mainWindow()), QtGui.QWidget)
-        elif qtMode == 1:
-            # ==== for PyQt====
-            parentWin = sip.wrapinstance(long(mui.MQtUtil.mainWindow()), QtCore.QObject)
-            
-    ui = TMP_UniversalToolUI_TND(parentWin) # extra note: in Maya () for no parent; (parentWin,mode) for extra mode input
-    ui.show()
-    # example: show ui stored
-    # print(ui.uiList.keys())
     return ui
-'''
+
 if __name__ == "__main__":
     main()
+
+if hostMode == "blender":
+    app = QtWidgets.QApplication(sys.argv)
+    ui = UniversalToolUI()
+    ui.show()
