@@ -1,22 +1,31 @@
 # universal_tool_template.py
-a quick Qt GUI tool development template for both Maya or Desktop application, supports automatically for both PySide and PyQt4
+a quick Qt GUI tool development template for Maya, Houdini, Nuke, Blender, Desktop;
+and it supports automatically for any combination of (Python 2.x, Python 3.x in 32bit and 64bit) with (PySide, PyQt4, PySide2, PyQt5)
 
 **Key Feature**
-  - automatically detect whether run in Maya panel mode or Desktop mode and its location
-  - automatically detect to use PySide Qt binding or PyQt4 Qt binding
-  - universal coding format, seamlessly works in all 4 combination conditions
+  - automatically detect its running host (Maya, Houdini, Nuke, Blender, Desktop)
+  - automatically detect its python version (Python 2.x, Python 3.x in 32bit and 64bit) and Qt binding (PySide, PyQt4, PySide2, PyQt5)
+  - universal coding format, seamlessly works in all 2x2x4=16 combination conditions
   - built-in json file operation and format text operation
   - built-in quickUI() v4.0 features and more example integrated inside, supported nested quickUI without expanding elements
   - built-in qui() v1.0 features and more example integrated inside
   - built-in automatically button, menuItem, message button action binding
-  - standalone, frameless, transparent-irregular-win-shape and always-on-top option
+  - standalone, frameless, transparent-irregular-win-shape and always-on-top template option provided inside
   - drag, move, right-click-menu window interface interaction functions
-  - example of invisible but functional button
+  - template of invisible but functional button
   - automatically use modern style for desktop app
-  - automatically icon load
+  - automatically icon load in its icons folder for the same file name icon
   - auto self location detection for both script mode and app mode
 
 **Feature**
+  * version 8.0: (2016.12.08)
+    * add python 3.5 support
+    * compatible with Maya 2014 (pyside), Maya 2017 (pyside2), nuke 10 (pyside), houdini 15 (pyside), blender 2.7.8(pyqt5), desktop (pyqt4)
+    * clean up code and better comment and layout
+  * version 7.4: (2016.11.15)
+    * disable drag move by default
+    * add auto text input valid and input related get function
+    * add more custom option for default_action() for buttons
   * version 7.3: (2016.10.13)
     * 7.3.1: minor tune for better look and notation, add 'tree, txt, space' on qui (2016.10.24)
     * add Maya UI name to Qt object 2-way conversion
@@ -63,25 +72,27 @@ a quick Qt GUI tool development template for both Maya or Desktop application, s
     - built-in auto button action linking
     - now quickSplitUI() supports more than 2 layouts or widgets
 
-**Usage**
+**How to Use**
 
   * Prepare into Your Tool:
-    1. search and find all these and do replace with your App or Tool name 
-`find: "TMP_UniversalToolUI_TND"; replace: "YourToolName"; inside the "universal_tool_template.py" file`
-    2. change the file name from "universal_tool_template.py" into "YourToolName.py"
-    3. use in maya: `import YourToolName;YourToolName.main()`
-    4. use in cmd: `python YourToolName.py`
-  * direct usage in maya: 
+    1. global replace "UniversalToolUI" to "YourToolName" in your editor
+    2. change file name "universal_tool_template.py" to "YourPreferedFileName.py"
+    3. load it up and run
+
+  * loading template - Run in Application's python panel:
 ```python
+import sys;myPath='/path_to_universal_tool_or_custom_name/';myPath in sys.path or sys.path.append(myPath);
 import universal_tool_template
-universal_tool_template.main()
+universal_tool_template.main() # no need this line for blender 
 ```
-  * usage in commandline: 
+
+  * loading template - Run in system command console
 ```python
 python universal_tool_template.py
 ```
 
-  * version 7 syntax 
+**My Varaible-Free Quick-GUI-Generating Text-Code Syntax**
+  * version 7 and above syntax 
 ```python
 quickUI(["elementA_btn;QPushButton;Title Here"], "config_layout;QVBoxLayout")
 
@@ -138,11 +149,12 @@ parentObject's insert_opt
 **File Structure**
 
   * universal_tool_template.py: main GUI and core function
-  * (required) if you want to use LNTextEdit in your tool.
+  * LNTextEdit.py: (required) if you want to use LNTextEdit in your tool.
 
 
 **Screenshot**
 
+![universal_tool_template_v8.0.png](screenshot/universal_tool_template_v8.0.png?raw=true)
 ![universal_tool_template_v7.3.png](screenshot/universal_tool_template_v7.3.png?raw=true)
 ![universal_tool_template_v5.0.png](screenshot/universal_tool_template_v5.0.png?raw=true)
 ![universal_tool_template_v4.0.png](screenshot/universal_tool_template_v4.0.png?raw=true)
@@ -164,7 +176,9 @@ display_textEdit.setZoom(1) # enable text zoom feature
 ```
 
 **feature list**
-
+version 4.0: (2016.12.08)
+  * python 3 support
+  * pyside, pyside2, pyqt4, pyqt5 support
 version 3.2: (2016.09.01)
   * add get/set/resetFontSize function
   * support ctrl+mouse wheel zoom in out text area, need to setZoom(1)
