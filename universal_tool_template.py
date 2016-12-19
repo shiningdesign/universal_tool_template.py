@@ -1,9 +1,10 @@
 '''
-Univeral Tool Template v008
+Univeral Tool Template v008.1
 by ying - https://github.com/shiningdesign/universal_tool_template.py
 
 log:
 v008: 2016.12.08:
+  * (2016.12.19): v008.1 more cleanup
   * add python 3 support
   * compatible with Maya 2014 (pyside), Maya 2017 (pyside2), nuke 10 (pyside), houdini 15 (pyside), blender 2.7.8(pyqt5), desktop (pyqt4)
   * clean up code
@@ -46,8 +47,10 @@ v003: 2016.07.22
 '''
 #------------------------------
 # How to Use: 
-# 1. global replace "UniversalToolUI" to "YourToolName" in your editor
-# 2. change file name "universal_tool_template.py" to "YourPreferedFileName.py"
+# 1. global replace class name "UniversalToolUI"  to "YourToolName" in your editor,
+#  - in icons folder, the Tool GUI icon should name as "YourToolName.png"
+# 2. change file name "universal_tool_template.py" to "YourPythonFileName.py",
+#  - in icons folder, the Maya shelf icon should name as "YourPythonFileName.png", if you name all name the same, then 1 icon is enough
 # 3. load it up and run
 #------------------------------
 # loading template - Run in python panel
@@ -61,9 +64,9 @@ universal_tool_template.main()
 python universal_tool_template.py
 '''
 
-tpl_ver = 8.0
+tpl_ver = 8.1
 hostMode = ""
-qtMode = 0 # 0: PySide; 1 : PyQt
+qtMode = 0 # 0: PySide; 1 : PyQt, 2: PySide2, 3: PyQt5
 qtModeList = ("PySide", "PyQt4", "PySide2", "PyQt5")
 
 # python 2,3 support unicode function
@@ -139,6 +142,8 @@ print("Python: {}".format(pyMode))
 # ==== template module list ====
 import os # for path and language code
 from functools import partial # for partial function creation
+import json # for file operation code
+import os # for language code
 
 # ================
 #  user module list
@@ -176,6 +181,9 @@ class UniversalToolUI(super_class):
         else:
             # unfrozen
             self.location = os.path.realpath(__file__) # location: ref: sys.modules[__name__].__file__
+        
+        # Custom variable
+        
         #------------------------------
         # initial data
         #------------------------------
@@ -206,7 +214,7 @@ class UniversalToolUI(super_class):
         self.quickMenuAction('helpHostMode_atnNone','Host Mode - {}'.format(hostMode),'Host Running.','', cur_menu)
         self.quickMenuAction('helpPyMode_atnNone','Python Mode - {}'.format(pyMode),'Python Library Running.','', cur_menu)
         self.quickMenuAction('helpQtMode_atnNone','Qt Mode - {}'.format(qtModeList[qtMode]),'Qt Library Running.','', cur_menu)
-        self.quickMenuAction('helpTemplate_atnNone','Universal Tool Teamplate - {}'.format(tpl_ver),'based on Univeral Tool Template v7 by Shining Ying - https://github.com/shiningdesign/universal_tool_template.py','', cur_menu)
+        self.quickMenuAction('helpTemplate_atnNone','Universal Tool Teamplate - {}'.format(tpl_ver),'based on Univeral Tool Template v{} by Shining Ying - https://github.com/shiningdesign/universal_tool_template.py'.format(tpl_ver),'', cur_menu)
         cur_menu.addSeparator()
         self.uiList['helpGuide_msg'] = "How to Use:\n1. Put source info in\n2. Click Process button\n3. Check result output\n4. Save memory info into a file."
         self.quickMenuAction('helpGuide_atnMsg','Usage Guide','How to Usge Guide.','helpGuide.png', cur_menu)
@@ -262,7 +270,7 @@ class UniversalToolUI(super_class):
             'split': 'QSplitter', 'grp':'QGroupBox', 'tab':'QTabWidget',
             'btn':'QPushButton', 'btnMsg':'QPushButton', 'label':'QLabel', 'input':'QLineEdit', 'check':'QCheckBox', 'choice':'QComboBox',
             'txtEdit': 'LNTextEdit', 'txt': 'QTextEdit',
-            'tree': 'QTreeWidget',
+            'tree': 'QTreeWidget', 'table': 'QTableWidget',
             'space': 'QSpacerItem', 
         }
         # get ui_list, creation or existing ui object
@@ -359,7 +367,8 @@ class UniversalToolUI(super_class):
                 self.uiList[ui_name].clicked.connect(getattr(self, ui_name[:-7]+"_message", partial(self.default_message,ui_name)))
             elif ui_name.endswith('_atnMsg'):
                 self.uiList[ui_name].triggered.connect(getattr(self, ui_name[:-4]+"_action", partial(self.default_message,ui_name)))
-                
+        # custom ui response
+        
     #=======================================
     # UI Response functions (custom + prebuilt functions)
     #=======================================
@@ -430,7 +439,9 @@ class UniversalToolUI(super_class):
     #- File Operation functions (optional and custom functions)
     #=======================================
     def fileExport_action(self):
-        file=str(self.uiList['filePath_input'].text())
+        filePath_input = self.uiList['filePath_input']
+        dataName = 'data'
+        file=str(filePath_input.text())
         # open file dialog if no text input for file path
         if file == "":
             file = QtWidgets.QFileDialog.getSaveFileName(self, "Save File","","RAW data (*.json);;Format Txt(*{});;AllFiles(*.*)".format(self.fileType))
@@ -440,15 +451,17 @@ class UniversalToolUI(super_class):
                 file = str(file) # for deal with pyqt case
         # read file if open file dialog not cancelled
         if not file == "":
-            self.uiList['filePath_input'].setText(file)
+            filePath_input.setText(file)
             if file.endswith(self.fileType): # formated txt file
-                self.writeFormatFile(self.process_rawData_to_formatData(self.memoData['data']), file) 
+                self.writeFormatFile(self.process_rawData_to_formatData(self.memoData[dataName]), file) 
             else: 
-                self.writeRawFile(self.memoData['data'], file) # raw json file
+                self.writeRawFile(self.memoData[dataName], file) # raw json file
             self.quickInfo("File: '"+file+"' creation finished.")
     
     def fileLoad_action(self):
-        file=str(self.uiList['filePath_input'].text())
+        filePath_input = self.uiList['filePath_input']
+        dataName = 'data'
+        file=str(filePath_input.text())
         # open file dialog if no text input for file path
         if file == "":
             file = QtWidgets.QFileDialog.getOpenFileName(self, "Open File","","RAW data (*.json);;Format Txt(*{});;AllFiles(*.*)".format(self.fileType))
@@ -458,11 +471,11 @@ class UniversalToolUI(super_class):
                 file = str(file) # for deal with pyqt case
         # read file if open file dialog not cancelled
         if not file == "":
-            self.uiList['filePath_input'].setText(file)
+            filePath_input.setText(file)
             if file.endswith(self.fileType): # formated txt file loading
-                self.memoData['data'] = self.process_formatData_to_rawData( self.readFormatFile(file) )
+                self.memoData[dataName] = self.process_formatData_to_rawData( self.readFormatFile(file) )
             else: 
-                self.memoData['data'] = self.readRawFile(file) # raw json file loading
+                self.memoData[dataName] = self.readRawFile(file) # raw json file loading
             self.memory_to_source_ui()
             self.quickInfo("File: '"+file+"' loading finished.")
     
