@@ -14,11 +14,13 @@ and it supports automatically for any combination of (Python 2.x, Python 3.x in 
   - drag, move, right-click-menu window interface interaction functions
   - template of invisible but functional button
   - automatically use modern style for desktop app
-  - automatically icon load in its icons folder for the same file name icon
+  - automatically icon load in its icons folder for the same file name icon for Maya shelf, and same class name icon for class ui
   - auto self location detection for both script mode and app mode
+  - automatically ui interface translation language export and auto load translation json file, which use UITranslator to create
 
 **Feature**
   * version 8.0: (2016.12.08)
+    * v8.1 (2016.12.20) more code cleaning
     * add python 3.5 support
     * compatible with Maya 2014 (pyside), Maya 2017 (pyside2), nuke 10 (pyside), houdini 15 (pyside), blender 2.7.8(pyqt5), desktop (pyqt4)
     * clean up code and better comment and layout
@@ -75,8 +77,10 @@ and it supports automatically for any combination of (Python 2.x, Python 3.x in 
 **How to Use**
 
   * Prepare into Your Tool:
-    1. global replace "UniversalToolUI" to "YourToolName" in your editor
-    2. change file name "universal_tool_template.py" to "YourPreferedFileName.py"
+    1. global replace class name "UniversalToolUI"  to "YourToolName" in your editor,
+      * in icons folder, the Tool GUI icon should name as "YourToolName.png"
+    2. change file name "universal_tool_template.py" to "YourPythonFileName.py",
+      * in icons folder, the Maya shelf icon should name as "YourPythonFileName.png", if you name all name the same, then 1 icon is enough
     3. load it up and run
 
   * loading template - Run in Application's python panel:
@@ -150,6 +154,8 @@ parentObject's insert_opt
 
   * universal_tool_template.py: main GUI and core function
   * LNTextEdit.py: (required) if you want to use LNTextEdit in your tool.
+  * UITranslator.py: (not required) a GUI tool to create translation json file from template's exported default language json
+  * install-v0.1_universal_tool_template.mel: (not required) a quick Maya shelf installer that auto put python tool in maya shelf based on naming format
 
 
 **Screenshot**
@@ -200,22 +206,34 @@ display_textEdit.setZoom(1) # enable text zoom feature
   * Note: UITranslator works for any tool created based on universal tool template above v6.1
 
 **Feature**
-  * load default language that exported from your tool based on universal tool template above v6.1
-  * create new translation and store them in memory before export to a language json file
-  * load multiple language json file
+  * version 2.0: (2016.12.20)
+    * rewrite based on universal_tool_template.py v8.1
+    * add reset action in file menu
+  * version 1.0: (2016.07.22)
+    * load default language that exported from your tool based on universal tool template above v6.1
+    * create new translation and store them in memory before export to a language json file
+    * load multiple language json file
 
-**Usage**
-  * language file naming format: ```ToolName_lang_YourLanguageName.json```
-  * usage in maya: 
+**How to Use**
+
+  * load in maya: 
 ```python
 import UITranslator
 UITranslator.main()
 ```
-  * usage in commandline:
+  * load in commandline:
 ```python
 python UITranslator.py
 ```
-
+  * usage:
+    * use load button at bottom to load up the exported default language json file from those universal_tool_template based tools
+    * file menu > add language to add a new translation
+    * translate one by one for your need in that table column
+    * click "Process and Update memory" button to update the table content into memory
+    * then, the drop down list for export shows which language you want to export, Note, make sure you change the path on the file input before you click Export button, otherwise, it will overwrite whatever in the file input's path
+  * output language file name format:
+    * language file naming format: ```ToolName_lang_YourLanguageName.json```
+    
 **File Structure**
   * UITranslator.py
   * LNTextEdit.py: mod 3rd party line number text edit ui element
@@ -225,12 +243,17 @@ python UITranslator.py
 
 ![uitranslator_v1.0.png](screenshot/uitranslator_v1.0.png?raw=true)
 
-#automatic Maya Tool Shelf Installer mel script (install_ToolName.mel)
+#auto maya shelf installer v3.0 (install-v0.1_PythonToolName.mel)
   * a script template that automatically install its nearby python tool to shelf, with icon set as well, in a simple process of drag-n-drop into maya window.
 
-**Installer ver 2 Usage**
-  - it is fully auto, just need to change mel file name as this format "install_YourPythonFileName.mel"
-  - put this file next to your python script file, your icon (32x32) with same name under "icons" folder
+**feature and usage**:
+  * version 3.0 (2016.12.20):
+    * Fully auto install by this file name, example "install_Python_File_Name.mel" or "install_PythonFileName.mel"
+    * the icon should be named as "Python_File_Name.png" or "PythonFileName" accordingly inside "icons" folder, your icon is (32x32) in size
+    * optionally with version number label on top, example: "install-v8.1_universal_tool_template.mel"
+    * if you need to change version label color and version label background rgba, change last line
+      * -overlayLabelColor 0 0 0 (0-1 means black to white) 
+      * -overlayLabelBackColor 1 1 1 0.0 (last float 0-1 means hide-show for bg color )
 
 #cross-platform cx_Freeze binary build script
   * just change the ToolName, and includes the folder or resource, then run buildScript in windows, mac, linux to create binary
