@@ -156,6 +156,9 @@ parentObject's insert_opt
   * LNTextEdit.py: (required) if you want to use LNTextEdit in your tool.
   * UITranslator.py: (not required) a GUI tool to create translation json file from template's exported default language json
   * install-v0.1_universal_tool_template.mel: (not required) a quick Maya shelf installer that auto put python tool in maya shelf based on naming format
+  * universal_tool_template.bat: window console mode or window mode auto launcher, it detect whether to use launch with pythonw or python by the file name
+    * if you name as YourPythonFileName.bat, it will launch a console to run your Py
+    * if you name as YourPythonFileName_w.bat, it will use Pythonw to directly run your Py without pop-up console floating there
 
 
 **Screenshot**
