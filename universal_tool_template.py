@@ -1,8 +1,27 @@
-'''
-Univeral Tool Template v008.1
-by ying - https://github.com/shiningdesign/universal_tool_template.py
+tpl_ver = 8.3
+# Univeral Tool Template v008.3
+# by ying - https://github.com/shiningdesign/universal_tool_template.py
 
-log:
+'''
+v008.3: 2017.02.20
+  * auto template builder compatiblility
+v008.2.2: 2017.02.14
+  * fix language update
+  * add icon related path
+v008.2: 2017.01.25
+  * change default template_class name to UniversalToolUI_####, so that you can have multiple template testing without duplicate class name in memory
+  * reduce code, 
+    - add self.icon
+    - add keep_margin_layout list
+    - take out help into self.help for quick change
+    - rewrite data file io functions, support json ascii data and cpickle binary data
+    - better quickMsgAsk dialog functions
+    - qui: add QListWidget
+    - quickUI: add header name list option for QTreeWidget
+    - todo: qui add QWidget
+    - todo: common class set, while all custom field inherient
+  * better support for template as widget in nested UI, menu creation check for widget
+  * remove all custom widget from template for clean start, you can add them later, like LNTextEdit
 v008: 2016.12.08:
   * (2016.12.19): v008.1 more cleanup
   * add python 3 support
@@ -47,7 +66,7 @@ v003: 2016.07.22
 '''
 #------------------------------
 # How to Use: 
-# 1. global replace class name "UniversalToolUI"  to "YourToolName" in your editor,
+# 1. change class name "UniversalToolUI"  to "YourToolName" in your editor,
 #  - in icons folder, the Tool GUI icon should name as "YourToolName.png"
 # 2. change file name "universal_tool_template.py" to "YourPythonFileName.py",
 #  - in icons folder, the Maya shelf icon should name as "YourPythonFileName.png", if you name all name the same, then 1 icon is enough
@@ -63,8 +82,6 @@ universal_tool_template.main()
 '''
 python universal_tool_template.py
 '''
-
-tpl_ver = 8.1
 hostMode = ""
 qtMode = 0 # 0: PySide; 1 : PyQt, 2: PySide2, 3: PyQt5
 qtModeList = ("PySide", "PyQt4", "PySide2", "PyQt5")
@@ -75,7 +92,7 @@ try:
 except NameError:
     unicode = lambda s: str(s)
 
-# ==== auto hostMode detect ====
+# ---- auto hostMode detect ----
 # ref: https://github.com/fredrikaverpil/pyvfx-boilerplate/blob/master/boilerplate.py
 
 try:
@@ -103,7 +120,7 @@ except ImportError:
                 hostMode = "desktop"
 print("Host: {}".format(hostMode))
     
-# ==== auto QtMode detection ====
+# ---- auto QtMode detection ----
 # ref: https://github.com/mottosso/Qt.py
 try:
     from PySide import QtGui, QtCore
@@ -134,22 +151,25 @@ except ImportError:
             qtMode = 3
             print("PyQt5 Try")
 
-# ==== auto PyMode detection ====
+# ---- auto PyMode detection ----
 import sys
 pyMode = '.'.join([ str(n) for n in sys.version_info[:3] ])
 print("Python: {}".format(pyMode))
 
-# ==== template module list ====
+# ---- template module list ----
 import os # for path and language code
 from functools import partial # for partial function creation
-import json # for file operation code
+import json # for ascii data output
+if sys.version_info[:3][0]<3:
+    import cPickle # for binary data output
+else:
+    import _pickle as cPickle
 import os # for language code
 
-# ================
+# --------------------
 #  user module list
-# ================
+# --------------------
 
-import LNTextEdit # for text edit code
 
 #------------------------------
 # user UI class choice
@@ -165,14 +185,10 @@ class UniversalToolUI(super_class):
         # class variables
         #------------------------------
         self.version="0.1"
+        self.help = "How to Use:\n1. Put source info in\n2. Click Process button\n3. Check result output\n4. Save memory info into a file."
+        
         self.uiList={} # for ui obj storage
         self.memoData = {} # key based variable data storage
-        
-        self.fileType='.UniversalToolUI_EXT'
-        # mode: example for receive extra user input as parameter
-        self.mode = 0
-        if mode in [0,1]:
-            self.mode = mode # mode validator
         
         self.location = ""
         if getattr(sys, 'frozen', False):
@@ -181,9 +197,14 @@ class UniversalToolUI(super_class):
         else:
             # unfrozen
             self.location = os.path.realpath(__file__) # location: ref: sys.modules[__name__].__file__
+            
+        self.name = self.__class__.__name__
+        self.iconPath = os.path.join(os.path.dirname(self.location),'icons',self.name+'.png')
+        self.iconPix = QtGui.QPixmap(self.iconPath)
+        self.icon = QtGui.QIcon(self.iconPath)
+        self.fileType='.{0}_EXT'.format(self.name)
         
-        # Custom variable
-        
+        # Custom user variable
         #------------------------------
         # initial data
         #------------------------------
@@ -191,7 +212,7 @@ class UniversalToolUI(super_class):
         
         self.setupStyle()
         if isinstance(self, QtWidgets.QMainWindow):
-            self.setupMenu() # only if you use QMainWindows Class
+            self.setupMenu()
         self.setupWin()
         self.setupUI()
         self.Establish_Connections()
@@ -203,34 +224,30 @@ class UniversalToolUI(super_class):
         if hostMode == "desktop":
             QtWidgets.QApplication.setStyle(QtWidgets.QStyleFactory.create('Cleanlooks'))
         self.setStyleSheet("QLineEdit:disabled{background-color: gray;}")
+    
     def setupMenu(self):
         self.quickMenu(['file_menu;&File','setting_menu;&Setting','help_menu;&Help'])
         cur_menu = self.uiList['setting_menu']
         self.quickMenuAction('setParaA_atn','Set Parameter &A','A example of tip notice.','setParaA.png', cur_menu)
         self.uiList['setParaA_atn'].setShortcut(QtGui.QKeySequence("Ctrl+R"))
         cur_menu.addSeparator()
-        # for info review
-        cur_menu = self.uiList['help_menu']
-        self.quickMenuAction('helpHostMode_atnNone','Host Mode - {}'.format(hostMode),'Host Running.','', cur_menu)
-        self.quickMenuAction('helpPyMode_atnNone','Python Mode - {}'.format(pyMode),'Python Library Running.','', cur_menu)
-        self.quickMenuAction('helpQtMode_atnNone','Qt Mode - {}'.format(qtModeList[qtMode]),'Qt Library Running.','', cur_menu)
-        self.quickMenuAction('helpTemplate_atnNone','Universal Tool Teamplate - {}'.format(tpl_ver),'based on Univeral Tool Template v{} by Shining Ying - https://github.com/shiningdesign/universal_tool_template.py'.format(tpl_ver),'', cur_menu)
-        cur_menu.addSeparator()
-        self.uiList['helpGuide_msg'] = "How to Use:\n1. Put source info in\n2. Click Process button\n3. Check result output\n4. Save memory info into a file."
-        self.quickMenuAction('helpGuide_atnMsg','Usage Guide','How to Usge Guide.','helpGuide.png', cur_menu)
-        
+        if 'help_menu' in self.uiList.keys():
+            # for info review
+            cur_menu = self.uiList['help_menu']
+            self.quickMenuAction('helpHostMode_atnNone','Host Mode - {}'.format(hostMode),'Host Running.','', cur_menu)
+            self.quickMenuAction('helpPyMode_atnNone','Python Mode - {}'.format(pyMode),'Python Library Running.','', cur_menu)
+            self.quickMenuAction('helpQtMode_atnNone','Qt Mode - {}'.format(qtModeList[qtMode]),'Qt Library Running.','', cur_menu)
+            self.quickMenuAction('helpTemplate_atnNone','Universal Tool Teamplate - {}'.format(tpl_ver),'based on Univeral Tool Template v{0} by Shining Ying - https://github.com/shiningdesign/universal{1}tool{1}template.py'.format(tpl_ver,'_'),'', cur_menu)
+            cur_menu.addSeparator()
+            self.uiList['helpGuide_msg'] = self.help
+            self.quickMenuAction('helpGuide_atnMsg','Usage Guide','How to Usge Guide.','helpGuide.png', cur_menu)
     def setupWin(self):
-        self.setWindowTitle("UniversalToolUI" + " - v" + self.version + " - host: " + hostMode)
-        self.setGeometry(500, 300, 250, 110) # self.resize(250,250)
-        
-        #------------------------------
-        # auto window icon setup
-        path = os.path.join(os.path.dirname(self.location),'icons','UniversalToolUI.png')
-        self.setWindowIcon(QtGui.QIcon(path))
-        
-        #------------------------------
+        self.setWindowTitle(self.name + " - v" + self.version + " - host: " + hostMode)
+        self.setWindowIcon(self.icon)
         # initial win drag position
         self.drag_position=QtGui.QCursor.pos()
+        
+        self.setGeometry(500, 300, 250, 110) # self.resize(250,250)
         
         #------------------------------
         # template list: for frameless or always on top option
@@ -269,8 +286,8 @@ class UniversalToolUI(super_class):
             'vbox': 'QVBoxLayout','hbox':'QHBoxLayout','grid':'QGridLayout', 'form':'QFormLayout',
             'split': 'QSplitter', 'grp':'QGroupBox', 'tab':'QTabWidget',
             'btn':'QPushButton', 'btnMsg':'QPushButton', 'label':'QLabel', 'input':'QLineEdit', 'check':'QCheckBox', 'choice':'QComboBox',
-            'txtEdit': 'LNTextEdit', 'txt': 'QTextEdit',
-            'tree': 'QTreeWidget', 'table': 'QTableWidget',
+            'txt': 'QTextEdit',
+            'list': 'QListWidget', 'tree': 'QTreeWidget', 'table': 'QTableWidget',
             'space': 'QSpacerItem', 
         }
         # get ui_list, creation or existing ui object
@@ -316,30 +333,26 @@ class UniversalToolUI(super_class):
             # main_layout for QDialog
             main_layout = self.quickLayout('vbox', 'main_layout')
             self.setLayout(main_layout)
-
+            
         #------------------------------
         # user ui creation part
         #------------------------------
         # + template: qui version since universal tool template v7
         #   - no extra variable name, all text based creation and reference
         
-        self.qui('source_txtEdit | process_btn;Process and Update', 'upper_vbox')
-        self.qui('upper_vbox | result_txtEdit', 'input_split;v')
+        self.qui('source_txt | process_btn;Process and Update', 'upper_vbox')
+        self.qui('upper_vbox | result_txt', 'input_split;v')
         self.qui('filePath_input | fileLoad_btn;Load | fileExport_btn;Export', 'fileBtn_layout;hbox')
         self.qui('input_split | fileBtn_layout', 'main_layout')
-        self.uiList["source_txtEdit"].setWrap(0)
-        self.uiList["result_txtEdit"].setWrap(0)
         
         # - template : quickUI version since universal tool template v6
         '''
-        upper_layout = self.quickUI(["source_txtEdit;LNTextEdit","process_btn;QPushButton;Process and Update"],"upper_QVBoxLayout")
+        upper_layout = self.quickUI(["source_txt;QTextEdit","process_btn;QPushButton;Process and Update"],"upper_QVBoxLayout")
         upper_layout.setContentsMargins(0,0,0,0)
         
-        input_split = self.quickSplitUI("input_split", [ upper_layout, self.quickUI(["result_txtEdit;LNTextEdit"])[0] ], "v")
+        input_split = self.quickSplitUI("input_split", [ upper_layout, self.quickUI(["result_txt;QTextEdit"])[0] ], "v")
         fileBtn_layout = self.quickUI(["filePath_input;QLineEdit", "fileLoad_btn;QPushButton;Load", "fileExport_btn;QPushButton;Export"],"fileBtn_QHBoxLayout")
         self.quickUI([input_split, fileBtn_layout], main_layout)
-        self.uiList["source_txtEdit"].setWrap(0)
-        self.uiList["result_txtEdit"].setWrap(0)
         '''
         
         # - template : invisible but functional button
@@ -352,10 +365,11 @@ class UniversalToolUI(super_class):
         '''
         
         #------------- end ui creation --------------------
-        for name,each in self.uiList.items():
-            if isinstance(each, QtWidgets.QLayout) and name!='main_layout' and not name.endswith('_grp_layout'):
-                each.setContentsMargins(0,0,0,0) # clear extra margin some nested layout
-        #self.quickInfo('Ready')
+        keep_margin_layout = ['main_layout']
+        for name, each in self.uiList.items():
+            if isinstance(each, QtWidgets.QLayout) and name not in keep_margin_layout and not name.endswith('_grp_layout'):
+                each.setContentsMargins(0, 0, 0, 0)
+        self.quickInfo('Ready')
         
     def Establish_Connections(self):
         for ui_name in self.uiList.keys():
@@ -366,21 +380,26 @@ class UniversalToolUI(super_class):
             elif ui_name.endswith('_btnMsg'):
                 self.uiList[ui_name].clicked.connect(getattr(self, ui_name[:-7]+"_message", partial(self.default_message,ui_name)))
             elif ui_name.endswith('_atnMsg'):
-                self.uiList[ui_name].triggered.connect(getattr(self, ui_name[:-4]+"_action", partial(self.default_message,ui_name)))
+                self.uiList[ui_name].triggered.connect(getattr(self, ui_name[:-7]+"_message", partial(self.default_message,ui_name)))
         # custom ui response
         
-    #=======================================
+    #############################################
     # UI Response functions (custom + prebuilt functions)
-    #=======================================
-    # ==== user response list ====
+    #############################################
+    
+    # ---- user response list ----
     def loadData(self):
         print("Load data")   
-        
+    
+    # - example button functions
     def process_action(self): # (optional)
         print("Process ....")
-        self.source_ui_to_memory()
+        source_txt = unicode(self.uiList['source_txt'].toPlainText())
+        # 2: update memory
+        self.memoData['data'] = [row.strip() for row in source_txt.split('\n')]
         print("Update Result")
-        self.memory_to_result_ui()
+        txt='\n'.join([('>>: '+row) for row in self.memoData['data']])
+        self.uiList['result_txt'].setText(txt)
     
     # - example functions
     def font_action(self):
@@ -388,7 +407,45 @@ class UniversalToolUI(super_class):
         if ok:
             self.uiList['font_label'].setFont(font)
     
-    # ==== template response list ====
+    # - example file io function
+    def fileExport_action(self):
+        filePath_input = self.uiList['filePath_input']
+        file = unicode(filePath_input.text())
+        if file == "":
+            file= self.quickFileAsk('export')
+        if file == "":
+            return
+        # update ui
+        filePath_input.setText(file)
+        # export process
+        ui_data = unicode(self.uiList['source_txt'].toPlainText())
+        # file process
+        if file.endswith('.dat'):
+            self.writeFileData(ui_data, file, binary=1)
+        else:
+            self.writeFileData(ui_data, file)
+        self.quickInfo("File: '"+file+"' creation finished.")
+    
+    def fileLoad_action(self):
+        filePath_input = self.uiList['filePath_input']
+        file=unicode(filePath_input.text())
+        if file == "":
+            file= self.quickFileAsk('import')
+        if file == "":
+            return
+        # update ui
+        filePath_input.setText(file)
+        # import process
+        ui_data = ""
+        if file.endswith('.dat'):
+            ui_data = self.readFileData(file, binary=1)
+        else:
+            ui_data = self.readFileData(file)
+        self.uiList['source_txt'].setText(ui_data)
+        self.quickInfo("File: '"+file+"' loading finished.")
+        
+    
+    #---- template response functions ----
     def default_action(self, ui_name):
         print("No action defined for this button: "+ui_name)
     def default_message(self, ui_name):
@@ -412,82 +469,7 @@ class UniversalToolUI(super_class):
         else:
             print("No action defined for this button: "+ui_name)    
     '''
-    #=======================================
-    #- UI and RAM content update functions (optional)
-    #=======================================
-    def memory_to_source_ui(self):
-        # update ui once memory gets update
-        txt='\n'.join([row for row in self.memoData['data']])
-        self.uiList['source_txtEdit'].setText(txt)
     
-    def memory_to_result_ui(self):
-        # update result ui based on memory data
-        txt='\n'.join([('>>: '+row) for row in self.memoData['data']])
-        self.uiList['result_txtEdit'].setText(txt)
-    
-    def source_ui_to_memory(self):
-        # 1: get source content
-        source_txt = unicode(self.uiList['source_txtEdit'].text())
-        # 2: update memory
-        self.memoData['data'] = [row.strip() for row in source_txt.split('\n')]
-        print("Memory: update finished.")
-        # 3. process memory data and update result ui
-        self.memory_to_result_ui()
-        print("Process: process memory finished.")
-    
-    #=======================================
-    #- File Operation functions (optional and custom functions)
-    #=======================================
-    def fileExport_action(self):
-        filePath_input = self.uiList['filePath_input']
-        dataName = 'data'
-        file=str(filePath_input.text())
-        # open file dialog if no text input for file path
-        if file == "":
-            file = QtWidgets.QFileDialog.getSaveFileName(self, "Save File","","RAW data (*.json);;Format Txt(*{});;AllFiles(*.*)".format(self.fileType))
-            if isinstance(file, (list, tuple)): # for deal with pyside case
-                file = file[0]
-            else:
-                file = str(file) # for deal with pyqt case
-        # read file if open file dialog not cancelled
-        if not file == "":
-            filePath_input.setText(file)
-            if file.endswith(self.fileType): # formated txt file
-                self.writeFormatFile(self.process_rawData_to_formatData(self.memoData[dataName]), file) 
-            else: 
-                self.writeRawFile(self.memoData[dataName], file) # raw json file
-            self.quickInfo("File: '"+file+"' creation finished.")
-    
-    def fileLoad_action(self):
-        filePath_input = self.uiList['filePath_input']
-        dataName = 'data'
-        file=str(filePath_input.text())
-        # open file dialog if no text input for file path
-        if file == "":
-            file = QtWidgets.QFileDialog.getOpenFileName(self, "Open File","","RAW data (*.json);;Format Txt(*{});;AllFiles(*.*)".format(self.fileType))
-            if isinstance(file, (list, tuple)): # for deal with pyside case
-                file = file[0]
-            else:
-                file = str(file) # for deal with pyqt case
-        # read file if open file dialog not cancelled
-        if not file == "":
-            filePath_input.setText(file)
-            if file.endswith(self.fileType): # formated txt file loading
-                self.memoData[dataName] = self.process_formatData_to_rawData( self.readFormatFile(file) )
-            else: 
-                self.memoData[dataName] = self.readRawFile(file) # raw json file loading
-            self.memory_to_source_ui()
-            self.quickInfo("File: '"+file+"' loading finished.")
-    
-    def process_formatData_to_rawData(self, file_txt):
-        # 1: prepare clean data from file Data
-        file_data=[] # to implement here
-        return file_data
-    def process_rawData_to_formatData(self, memo_data):
-        # 1: prepare memory data from file Data
-        file_txt = '' # to implement here
-        return file_txt
-        
     #############################################################
     #############################################################
     # ----------------- CORE TEMPLATE FUNCTIONS -----------------
@@ -567,22 +549,26 @@ class UniversalToolUI(super_class):
         if ui_name in self.uiList.keys():
             self.uiList[ui_name].setText(text)
     #############################################
-    # json and text data functions
+    # data and text data functions
     #############################################
-    def readRawFile(self,file):
+    def readFileData(self,file,binary=0):
         with open(file) as f:
-            data = json.load(f)
+            if binary == 0:
+                data = json.load(f)
+            else:
+                data = cPickle.load(f)
         return data
-    def writeRawFile(self, data, file):
+    def writeFileData(self,data,file,binary=0):
         with open(file, 'w') as f:
-            json.dump(data, f)
-            
-    # format data functions
-    def readFormatFile(self, file):
+            if binary == 0:
+                json.dump(data, f)
+            else:
+                cPickle.dump(data, f)
+    def readFileText(self, file):
         with open(file) as f:
             txt = f.read()
         return txt
-    def writeFormatFile(self, txt, file):    
+    def writeFileText(self, txt, file):    
         with open(file, 'w') as f:
             f.write(txt)
     #############################################
@@ -609,11 +595,12 @@ class UniversalToolUI(super_class):
     # UI language functions
     #############################################
     def loadLang(self):
-        self.quickMenu(['language_menu;&Language'])
-        cur_menu = self.uiList['language_menu']
-        self.quickMenuAction('langDefault_atnLang', 'Default','','langDefault.png', cur_menu)
-        cur_menu.addSeparator()
-        self.uiList['langDefault_atnLang'].triggered.connect(partial(self.setLang,'default'))
+        if isinstance(self, QtWidgets.QMainWindow):
+            self.quickMenu(['language_menu;&Language'])
+            cur_menu = self.uiList['language_menu']
+            self.quickMenuAction('langDefault_atnLang', 'Default','','langDefault.png', cur_menu)
+            cur_menu.addSeparator()
+            self.uiList['langDefault_atnLang'].triggered.connect(partial(self.setLang,'default'))
         # store default language
         self.memoData['lang']={}
         self.memoData['lang']['default']={}
@@ -642,12 +629,13 @@ class UniversalToolUI(super_class):
         for fileName in os.listdir(lang_path):
             if fileName.startswith(baseName+"_lang_"):
                 langName = fileName.replace(baseName+"_lang_","").split('.')[0].replace(" ","")
-                self.memoData['lang'][ langName ] = self.readRawFile( os.path.join(lang_path,fileName) )
-                self.quickMenuAction(langName+'_atnLang', langName.upper(),'',langName + '.png', cur_menu)
-                self.uiList[langName+'_atnLang'].triggered.connect(partial(self.setLang,langName))
+                self.memoData['lang'][ langName ] = self.readFileData( os.path.join(lang_path,fileName) )
+                if isinstance(self, QtWidgets.QMainWindow):
+                    self.quickMenuAction(langName+'_atnLang', langName.upper(),'',langName + '.png', self.uiList['language_menu'])
+                    self.uiList[langName+'_atnLang'].triggered.connect(partial(self.setLang,langName))
         # if no language file detected, add export default language option
-        if len(self.memoData['lang']) == 1:
-            self.quickMenuAction('langExport_atnLang', 'Export Default Language','','langExport.png', cur_menu)
+        if isinstance(self, QtWidgets.QMainWindow) and len(self.memoData['lang']) == 1:
+            self.quickMenuAction('langExport_atnLang', 'Export Default Language','','langExport.png', self.uiList['language_menu'])
             self.uiList['langExport_atnLang'].triggered.connect(self.exportLang)
     def setLang(self, langName):
         uiList_lang_read = self.memoData['lang'][langName]
@@ -682,7 +670,7 @@ class UniversalToolUI(super_class):
             file = str(file) # for deal with pyqt case
         # read file if open file dialog not cancelled
         if not file == "":
-            self.writeRawFile( self.memoData['lang']['default'], file )
+            self.writeFileData( self.memoData['lang']['default'], file )
             self.quickMsg("Languge File created: '"+file)
     #############################################
     # quick ui function for speed up programming
@@ -821,6 +809,11 @@ class UniversalToolUI(super_class):
                                     if uiType == 'QComboBox':
                                         self.uiList[uiName] = QtWidgets.QComboBox()
                                         self.uiList[uiName].addItems(arg_list)
+                                        ui_list.append(self.uiList[uiName])
+                                        ui_create_state = 1
+                                    elif uiType == 'QTreeWidget':
+                                        self.uiList[uiName] = QtWidgets.QTreeWidget()
+                                        self.uiList[uiName].setHeaderLabels(arg_list)
                                         ui_list.append(self.uiList[uiName])
                                         ui_create_state = 1
                                     elif uiType == 'QSpacerItem':
@@ -1055,10 +1048,27 @@ class UniversalToolUI(super_class):
         tmpMsg.setText(msg)
         tmpMsg.addButton("OK",QtWidgets.QMessageBox.YesRole)
         tmpMsg.exec_()
-    def quickMsgAsk(self, msg):
-        txt, ok = QtWidgets.QInputDialog.getText(self, "Input", msg)
-        return (str(txt), ok)
-
+    def quickMsgAsk(self, msg, mode=0, choice=[]):
+        # getItem, getInteger, getDouble, getText
+        modeOpt = (QtWidgets.QLineEdit.Normal, QtWidgets.QLineEdit.NoEcho, QtWidgets.QLineEdit.Password, QtWidgets.QLineEdit.PasswordEchoOnEdit)
+        # option: QtWidgets.QInputDialog.UseListViewForComboBoxItems
+        if len(choice)==0:
+            txt, ok = QtWidgets.QInputDialog.getText(self, "Input", msg, modeOpt[mode])
+            return (unicode(txt), ok)
+        else:
+            txt, ok = QtWidgets.QInputDialog.getItem(self, "Input", msg, choice, 0, 0)
+            return (unicode(txt), ok)   
+    def quickFileAsk(self, type):
+        file = ""
+        if type == 'export':
+            file = QtWidgets.QFileDialog.getSaveFileName(self, "Save File","","RAW data (*.json);;RAW binary data(*.dat);;Format Txt(*{0});;AllFiles(*.*)".format(self.fileType))
+        elif type == 'import':
+            file = QtWidgets.QFileDialog.getOpenFileName(self, "Open File","","RAW data (*.json);;RAW binary data(*.dat);;Format Txt(*{});;AllFiles(*.*)".format(self.fileType))
+        if isinstance(file, (list, tuple)):
+            file = file[0] # for deal with pyside case
+        else:
+            file = unicode(file) # for deal with pyqt case
+        return file
     def mui_to_qt(self, mui_name):
         if hostMode != "maya":
             return
@@ -1086,7 +1096,6 @@ class UniversalToolUI(super_class):
             ref = long(sip.unwrapinstance(qt_obj))
         if ref is not None:
             return mui.MQtUtil.fullName(ref)
-
 #############################################
 # window instance creation
 #############################################
