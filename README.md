@@ -8,23 +8,25 @@ It automatically supports any combination of (Python 2.x, Python 3.x in 32bit an
 Key Feature
 -------------
 
-Feature | Description
--- | --
-**Host Detection** | Maya, Houdini, Nuke, Blender, Desktop
-**Python Detection** | 2.x, 3.x, 32bit, 64bit
-**Qt Binding Detection** | PySide, PyQt4, PySide2, PyQt5
-**Universal Coding** | seamlessly works in above 2x2x4=16 combinations
-**File IO Support** | json, cPicle binary, plain text
-**oneline multi-UI creation** | quickUI() v4.0; qui() v1.0
-**one-stop UI management** | self.uiList, self.iconList
-**auto UI-Action bindinig** | button, menuItem, message button
-**auto Icon loading** | maya shelf icon, class name icon
-**Template Style Option** | standalone, frameless, trans-irregular, on-top
-**Global Style Option** | modern style
-**Interface Interaction** | Drag, Move, right-click-menu
-**Element Style Option** | invisible-functional button
-**Extension Features** | self location for script mode and app mode
-**Language Features** | auto Export and Load UI language json
+
+| Feature | Description |
+| :------------- |:-------------|
+| **Host Detection** | Maya, Houdini, Nuke, Blender, Desktop |
+| **Python Detection** | 2.x, 3.x, 32bit, 64bit |
+| **Qt Binding Detection** | PySide, PyQt4, PySide2, PyQt5 |
+| **Universal Coding** | seamlessly works in above 2x2x4=16 combinations |
+| **File IO Support** | json, cPicle binary, plain text |
+| **oneline multi-UI creation** | quickUI() v4.0; qui() v1.0 |
+| **one-stop UI management** | self.uiList, self.iconList |
+| **auto UI-Action bindinig** | button, menuItem, message button |
+| **auto Icon loading** | maya shelf icon, class name icon |
+| **Template Style Option** | standalone, frameless, trans-irregular, on-top |
+| **Global Style Option** | modern style |
+| **Interface Interaction** | Drag, Move, right-click-menu |
+| **Element Style Option** | invisible-functional button |
+| **Extension Features** | self location for script mode and app mode |
+| **Language Features** | auto Export and Load UI language json |
+
 
 Change Log
 -------------
@@ -150,7 +152,7 @@ quickUI(["elementA_btn;QPushButton;Title Here"], "config_layout;QVBoxLayout")
 element_list:
 
 ui_name@ui_label;ui_type;ui_opts
--------------------------------------
+#####################################
 elementA_btn;QPushButton;Title Here
 elementA_btn@User label;QPushButton;Title Here
 elementB_choice@Choose one;QComboBox;(A,B,C,4)
@@ -166,7 +168,7 @@ elementB_grp@System label;QGroupBox;vbox,My Group Title
 
 parentObject
 parent_name;parent_type;parent_opts
--------------------------------------
+#####################################
 config_layout;QVBoxLayout
 config_vbox
 config_split;QSplitter;v
@@ -176,7 +178,7 @@ main_tab
 main_tab;QTabWidget
 
 parentObject's insert_opt
--------------------------------------
+#####################################
 gridLayout: "h", "v" for grid insertion
 tab: (Tab A, Tab B, Tab C) for tab name insertion
 
@@ -187,14 +189,14 @@ qui('elementA_btn;Title Here | elementB_label;Label here', 'config_vbox')
 element_list:
 
 ui_name@ui_label;ui_opts
--------------------------------------
+#####################################
 can't use ; in ui_opts
 
 parentObject
 parent_name;parent_type;parent_opts
--------------------------------------
+#####################################
 parentObject's insert_opt
--------------------------------------
+#####################################
 ```
 
 File Structure
