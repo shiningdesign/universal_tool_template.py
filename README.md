@@ -1,71 +1,115 @@
-# universal_tool_template.py
-a quick Qt GUI tool development template for Maya, Houdini, Nuke, Blender, Desktop;
-and it supports automatically for any combination of (Python 2.x, Python 3.x in 32bit and 64bit) with (PySide, PyQt4, PySide2, PyQt5)
+universal_tool_template.py
+===================
 
-**Key Feature**
-  - automatically detect its running host (Maya, Houdini, Nuke, Blender, Desktop)
-  - automatically detect its python version (Python 2.x, Python 3.x in 32bit and 64bit) and Qt binding (PySide, PyQt4, PySide2, PyQt5)
-  - universal coding format, seamlessly works in all 2x2x4=16 combination conditions
-  - built-in json file operation and format text operation
-  - built-in quickUI() v4.0 features and more example integrated inside, supported nested quickUI without expanding elements
-  - built-in qui() v1.0 features and more example integrated inside
-  - built-in automatically button, menuItem, message button action binding
-  - standalone, frameless, transparent-irregular-win-shape and always-on-top template option provided inside
-  - drag, move, right-click-menu window interface interaction functions
-  - template of invisible but functional button
-  - automatically use modern style for desktop app
-  - automatically icon load in its icons folder for the same file name icon for Maya shelf, and same class name icon for class ui
-  - auto self location detection for both script mode and app mode
-  - automatically ui interface translation language export and auto load translation json file, which use UITranslator to create
+A quick Qt GUI tool development template for Maya, Houdini, Nuke, Blender, Desktop;
 
-**Feature**
-  * version 8.0: (2016.12.08)
-    * v8.1 (2016.12.20) more code cleaning
-    * add python 3.5 support
-    * compatible with Maya 2014 (pyside), Maya 2017 (pyside2), nuke 10 (pyside), houdini 15 (pyside), blender 2.7.8(pyqt5), desktop (pyqt4)
-    * clean up code and better comment and layout
-  * version 7.4: (2016.11.15)
-    * disable drag move by default
-    * add auto text input valid and input related get function
-    * add more custom option for default_action() for buttons
-  * version 7.3: (2016.10.13)
-    * 7.3.1: minor tune for better look and notation, add 'tree, txt, space' on qui (2016.10.24)
-    * add Maya UI name to Qt object 2-way conversion
-  * version 7.2: (2016.09.20)
-    * fix layout margin clear
-    * add quickPolicy
-    * add quickInfo for quick notify and feedback, user customizable
-    * fix btnMsg issue
-  * version 7: (2016.09.15)
-    * rewrite quickUI, backward compatible, and also optimized label creation for form layout, only create label when needed
-    * enable you to directly nest quickUI inside quickUI with various return type,
-      * eg. self.quickUI([self.quickUI(), self.quickUI()], 'main_vbox')
-    * enable you to quickUI with tab, split, groupbox as layout object, same creation string syntax as element
-    * a even compact pure text based UI creation and reference function on top of quickUI, called "qui()"
-  * version 6.2:
-    * (to do) format utf8 text output support
-    * add unicode for text read, better structure for fast template update and cleanup
-  * version 6.1: (2016.08.18)
-    - (v6.1.3) unicode support for template text edit
-    - rewrite lang functions
-    - fix qmenu creation for lang function
-    - fix file icon template name
-  * version 6.0: (2016.08.16)
-    - self location and location for load lang
-    - window icon support and window initial drag position
-    - quickMsgAsk for user input
-    - quickTabUI (no tab name lang out yet)
-    - better fixed area and user change area separation and code cleanup
-  * version 5.0: (2016.07.30)
-    * add language support with json file
-    * support better QGridLayout with "h" or "v" insertion
-  * version 4.0: (2016.07.28)
-    -  built-in automatically button and menuItem action binding
-    - standalone, frameless, transparent-irregular-win-shape and always-on-top option
-    - drag, move, right-click-menu window interface interaction functions
-    - example of invisible but functional button
-    - automatically use modern style for desktop app
-  * version 3.0: (2016.07.22)
+It automatically supports any combination of (Python 2.x, Python 3.x in 32bit and 64bit) with (PySide, PyQt4, PySide2, PyQt5)
+
+Key Feature
+-------------
+
+Feature | Description
+-- | --
+**Host Detection** | Maya, Houdini, Nuke, Blender, Desktop
+**Python Detection** | 2.x, 3.x, 32bit, 64bit
+**Qt Binding Detection** | PySide, PyQt4, PySide2, PyQt5
+**Universal Coding** | seamlessly works in above 2x2x4=16 combinations
+**File IO Support** | json, cPicle binary, plain text
+**oneline multi-UI creation** | quickUI() v4.0; qui() v1.0
+**one-stop UI management** | self.uiList, self.iconList
+**auto UI-Action bindinig** | button, menuItem, message button
+**auto Icon loading** | maya shelf icon, class name icon
+**Template Style Option** | standalone, frameless, trans-irregular, on-top
+**Global Style Option** | modern style
+**Interface Interaction** | Drag, Move, right-click-menu
+**Element Style Option** | invisible-functional button
+**Extension Features** | self location for script mode and app mode
+**Language Features** | auto Export and Load UI language json
+
+Change Log
+-------------
+
+* v008.3: 2017.02.20
+  * auto template builder compatiblility
+* v008.2.2: 2017.02.14
+  * fix language update
+  * add icon related path
+* v008.2: 2017.01.25
+  * change default template_class name to UniversalToolUI_####, so that you can have multiple template testing without duplicate class name in memory
+  * reduce code, 
+     - add self.icon
+     - add keep_margin_layout list
+     - take out help into self.help for quick change
+     - rewrite data file io functions, support json ascii data and cpickle binary data
+     - better quickMsgAsk dialog functions
+     - qui: add QListWidget
+     - quickUI: add header name list option for QTreeWidget
+  * better support for template as widget in nested UI, menu creation check for widget
+  * remove all custom widget from template for clean start, you can add them later, like LNTextEdit
+* v008: 2016.12.08:
+  * (2016.12.19): v008.1 more cleanup
+  * add python 3 support
+  * compatible with Maya 2014 (pyside), Maya 2017 (pyside2), nuke 10 (pyside), houdini 15 (pyside), blender 2.7.8(pyqt5), desktop (pyqt4)
+  * clean up code
+* v007.4: 2016.11.15
+  * disable drag move by default
+  * add auto text input valid and input related get function
+  * add more custom option for default_action() for buttons
+* v007.3: 2016.10.13
+  * add functions for convert between Maya built-in UI creation and Qt Widget Object, 
+  * Qt use object pointer reference, Maya use object name
+* v007.2: 2016.09.20
+  * fix layout margin clear
+  * add quickPolicy
+  * add quickInfo for quick notify and feedback, user customizable
+* v007: 2016.09.09
+  * v7.1: fix btnMsg issue
+  * rewrite quickUI, backward compatible, and also optimized label creation for form layout, only create label when needed
+  * enable you to directly nest quickUI inside quickUI with various return type,
+    * eg. self.quickUI([self.quickUI(), self.quickUI()], 'main_vbox')
+  * enable you to quickUI with tab, split, groupbox as layout object, same creation string syntax as element
+  * a even compact pure text based UI creation and reference function on top of quickUI, called "qui()"
+* v006.2: 2016.09.01
+  * add utf8 support
+  * better structure for fast template update
+* v006.1.2:
+  - add hotkey example
+  - add self.memoData['data'] for default, since not affect self.memoData['lang']
+* v006.1:
+  - self location and location for load lang
+  - window icon support and window intitial drag position
+  - quickMsgAsk for user input
+  - quickTabUI (no tab name lang out yet)
+  - improve lang functions
+  - fix qmenu creation for lang function
+  - fix file icon template name
+* v005: 2016.07.30 
+ - add translation and stype function, better grid layout
+* v004: 2016.07.28
+* v003: 2016.07.22
+
+----------
+
+How to Use
+-------------
+  * Prepare into Your Tool:
+    1. global replace class name "UniversalToolUI"  to "YourToolName" in your editor,
+      * in icons folder, the Tool GUI icon should name as "YourToolName.png"
+    2. change file name "universal_tool_template.py" to "YourPythonFileName.py",
+      * in icons folder, the Maya shelf icon should name as "YourPythonFileName.png", if you name all name the same, then 1 icon is enough
+    3. load it up and run
+
+  * loading template - Run in Application's python panel:
+```python
+import sys;myPath='/path_to_universal_tool_or_custom_name/';myPath in sys.path or sys.path.append(myPath);
+import universal_tool_template
+universal_tool_template.main() # no need this line for blender 
+```
+
+  * loading template - Run in system command console
+```python
+python universal_tool_template.py
+```
     - automatically detect whether run in Maya panel mode or Desktop mode
     - automatically detect to use PySide Qt binding or PyQt4 Qt binding
     - universal coding format, seamlessly works in all 4 combination conditions
@@ -94,8 +138,11 @@ universal_tool_template.main() # no need this line for blender
 ```python
 python universal_tool_template.py
 ```
+One-line Multi-UI Creation Syntax
+===================
 
-**My Varaible-Free Quick-GUI-Generating Text-Code Syntax**
+My Varaible-Free Quick-GUI-Generating Text-Code Syntax
+-------------
   * version 7 and above syntax 
 ```python
 quickUI(["elementA_btn;QPushButton;Title Here"], "config_layout;QVBoxLayout")
@@ -150,18 +197,24 @@ parentObject's insert_opt
 -------------------------------------
 ```
 
-**File Structure**
+File Structure
+===================
 
   * universal_tool_template.py: main GUI and core function
-  * LNTextEdit.py: (required) if you want to use LNTextEdit in your tool.
-  * UITranslator.py: (not required) a GUI tool to create translation json file from template's exported default language json
-  * install-v0.1_universal_tool_template.mel: (not required) a quick Maya shelf installer that auto put python tool in maya shelf based on naming format
+  * universal_tool_template_UserClass.py: same as above but with all changable code moved into UserClass
+  * LNTextEdit.py: (optional) if you want to use LNTextEdit in your tool.
+  * UITranslator.py: (optional) a GUI tool to create translation json file from template's exported default language json
+  * install-v0.1_universal_tool_template.mel: (optional) a quick Maya shelf installer that auto put python tool in maya shelf based on naming format
+  * reload_universal_tool_template.mel: (optional) a quick Maya shelf installer that auto reload your tool, good for code test
   * universal_tool_template.bat: window console mode or window mode auto launcher, it detect whether to use launch with pythonw or python by the file name
     * if you name as YourPythonFileName.bat, it will launch a console to run your Py
     * if you name as YourPythonFileName_w.bat, it will use Pythonw to directly run your Py without pop-up console floating there
+    * if you name as YourPythonFileName_z.bat, it will launch without console in Python3 (change the py3 path inside)
+    * if you name as YourPythonFileName_x.bat, it will launch with console in Python3 (change the py3 path inside)
 
 
-**Screenshot**
+Screenshot
+===================
 
 ![universal_tool_template_v8.0.png](screenshot/universal_tool_template_v8.0.png?raw=true)
 ![universal_tool_template_v7.3.png](screenshot/universal_tool_template_v7.3.png?raw=true)
@@ -169,8 +222,11 @@ parentObject's insert_opt
 ![universal_tool_template_v4.0.png](screenshot/universal_tool_template_v4.0.png?raw=true)
 ![universal_tool_template_v3.0.png](screenshot/universal_tool_template_v3.0.png?raw=true)
 
-#LNTextEdit.py
+File Structure in Details
+===================
 
+LNTextEdit.py
+-------------
   * a line number text edit Ui element, a replacement of the original LNTextEdit and my variations like LNTextEditEx, LNTextEdit_Pside, LNTextEdit_PyQt
 
 **usage**
@@ -203,8 +259,8 @@ display_textEdit.setZoom(1) # enable text zoom feature
     * support text() function
     * better and clear code for PyQt4 and PySide
   
-#UITranslator.py
-
+UITranslator.py
+-------------
   * A tool to create UI interface translation language json file for auto load into universal tool template
   * Note: UITranslator works for any tool created based on universal tool template above v6.1
 
