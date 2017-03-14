@@ -199,6 +199,61 @@ parentObject's insert_opt
 #####################################
 ```
 
+Universal Tool Template UI creation syntax
+-------------
+
+now all the creation is using qui function
+
+| UI element | syntax | 
+| --------- | ------------ |
+| **QVBoxLayout** | `self.qui('my_vbox')` <br> `self.qui('my_layout;vbox')` |  
+| **QHBoxLayout** | `self.qui('my_hbox')` <br> `self.qui('my_layout;hbox')` |  
+| **QGridLayout** | `self.qui('my_grid')` <br> `self.qui('my_layout;grid')` |  
+| | `self.qui('box_btn;Box| sphere_btn;Sphere  | ring_btn;Ring', 'my_layout;grid', 'h')` |  
+|  | create and insert those 3 buttons as horizontal row in the grid  | 
+| | `self.qui('box_btn;Box| sphere_btn;Sphere  | ring_btn;Ring', 'my_layout;grid', 'h')` <br> `self.qui('box2_btn;Box2 | sphere2_btn;Sphere2 | ring2_btn;Ring2', 'my_layout', 'h')` | 
+|  | create 2 rows of button, first row (Box,Sphere,Rig), second row (Box2,Sphere2,Ring2)  | 
+| | `self.qui('cat_btn;Cat| dog_btn;Dog  | pig_btn;Pig', 'pet_layout;grid', 'v') ` <br> `self.qui('cat2_btn;Cat2 | dog2_btn;Dog2 | pig2_btn;Pig2', 'pet_layout', 'v') ` | 
+|  | create 2 column of button, first column (cat,dog,pig), second column (cat2,dog2,pig2) | 
+| **QFormLayout** | self.qui('my_form') <br> self.qui('my_layout;form') |  
+| | `self.qui('name_input@Name:;John  | email_input@Email:;test@test.com', 'entry_form')` |  
+|  | create a name input with label "Name:" and default text "John", and then create email input with label "Email" and default text "test@test.com" inside entry_form form layout | 
+| | | 
+| **QSplitter** | `self.qui('user_layout | info_layout', 'my_split;h')` <br> `self.qui('user_grp | info_tab', 'my_split;h')` |
+|  | put user UI and info UI side by side in split, <br> child can be either a layout or widget | 
+| **QGroupBox** | `self.qui('user2_btn;User2 | info2_btn;Info2', 'my_grp;vbox,Personal Data')` | 
+|  | put user UI and info UI inside "my_grp" group box and with internal vbox layout and title as "Personal Data" <br> Note:**no ,() in title** | 
+| **QWidget** | `self.qui('user_label;Name | user_input', 'user_widget;vbox')` |  
+|  | like Groupbox widget, but without a title, useful for hide show a set of UIs | 
+| **QTabWidget** | `self.qui('client_layout | product_layout', 'database_tab;h', '(Client,Product)')` |
+|  | put client UI and product UI into database_tab tabwidget, as horizontal tab, with title as "Client", "Product", UI can be either widget or layout | 
+| | | 
+| **QPushButton** | `self.qui('my_btn;Submit')` |  
+|  | create pushbutton with title "Submit" | 
+| ? | `self.qui('my_btnMsg')`  | 
+| **QLabel** | `self.qui('info_label;Please select all objects')` |  
+|  | a label with text "Please select all objects"  | 
+| **QLineEdit** | `self.qui('user_input;Your Email')` |  
+|  | a line input with default text "Your Email" | 
+| **QCheckBox** | `self.qui('testOnly_check;Run as Test Only')` | 
+|  | create a check box with title "Run as Test Only"  | 
+| **QComboBox** | `self.qui('objectType_choice;(Box,Sphere,Ring)')` |
+|  | create a drop down list with option "Box", "Sphere", "Ring"| 
+| || 
+| **QTextEdit** | `self.qui('comment_txt;Please write details here')`  |
+|  | create a text area with default text "Please write details here" | 
+| || 
+| **QListWidget** | `self.qui('name_list;(Name,Path)')` |
+|  | create a list widget with column names as "Name", "Path"| 
+| **QTreeWidget** | `self.qui('file_tree;(Name,Path)')` |
+|  | create a tree widget with column names as "Name", "Path"| 
+| **QTableWidget** | `self.qui('data_table;(Name,Email,Phone)')` |
+|  | create a data table with column name as "Name", "Email", "Phone" | 
+| || 
+| **QSpacerItem** | `self.qui('user_space;(100,30,4,3)')` | 
+|  | create a space item with policy expanding horizontally and normal vertically <br> # 0 = fixed; 1 > min; 2 `< max; 3 = prefered; 4 = <expanding>`; 5 = expanding> Aggresive; 6=4 ignored size input | 
+
+
 File Structure
 ===================
 
