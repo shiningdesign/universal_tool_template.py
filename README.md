@@ -243,8 +243,8 @@ now all the creation is using qui function
 | **QTextEdit** | `self.qui('comment_txt;Please write details here')`  |
 |  | create a text area with default text "Please write details here" | 
 | || 
-| **QListWidget** | `self.qui('name_list;(Name,Path)')` |
-|  | create a list widget with column names as "Name", "Path"| 
+| **QListWidget** | `self.qui('name_list')` |
+|  | note, list has no header and single column | 
 | **QTreeWidget** | `self.qui('file_tree;(Name,Path)')` |
 |  | create a tree widget with column names as "Name", "Path"| 
 | **QTableWidget** | `self.qui('data_table;(Name,Email,Phone)')` |
