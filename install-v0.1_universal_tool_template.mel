@@ -1,9 +1,10 @@
 /*
-name: auto maya shelf installer v3.0 - by ying
+name: auto maya shelf installer v5.0 - by ying
 feature:
   * Fully auto install by this file name, example "install_Python_File_Name.mel" or "install_PythonFileName.mel"
   * the icon should be named as "Python_File_Name.png" or "PythonFileName" accordingly inside "icons" folder
   * optionally with version number label on top, example: "install-v8.1_universal_tool_template.mel"
+  * ctrl+ LMB click to pop "reload" submenu
 */
 global proc Tool_Locator (){} // a catcher empty functon for get cmd path
 global proc string[] Tool_Location_v2 (){
@@ -23,11 +24,12 @@ global proc string[] Tool_Location_v2 (){
     string $script_name = `substring $install_version_script_name (size($install_version)+2) (size($install_version_script_name))`;
     string $bufferC[];
     int $numTokC=`tokenize $install_version "-" $bufferC`;
+    string $action = $bufferC[0];
     string $version = "";
     if($numTokC == 2) $version = $bufferC[1];
     if(startsWith($version, "v")) $version = `substring $version 2 (size($version))`;
     
-    return {$scriptLocation,$script_name,$version};
+    return {$scriptLocation,$script_name,$version,$action};
 }
 // - step 1: prepare shelf
 global string $gShelfTopLevel;
@@ -38,6 +40,10 @@ string $tool_info[] = `Tool_Location_v2`;
 string $icon=$tool_info[0] + "icons/" + $tool_info[1] +".png";
 string $cmd ="import sys;myPath='"+$tool_info[0]+"';myPath in sys.path or sys.path.append(myPath);";
 $cmd+="import "+$tool_info[1]+";"+$tool_info[1]+".main()";
+string $reload_cmd ="reload("+$tool_info[1]+");";
 // - step 3: create shelf btn
-shelfButton -c $cmd -ann $tool_info[1] -l $tool_info[1] -imageOverlayLabel $tool_info[2] -overlayLabelColor 0 0 0 -overlayLabelBackColor 0 0 0 0.0 -image $icon -image1 $icon -sourceType "python";
+string $curBtn = `shelfButton -c $cmd -ann $tool_info[1] -l $tool_info[1] -imageOverlayLabel $tool_info[2] -overlayLabelColor 0 0 0 -overlayLabelBackColor 0 0 0 0.0 -image $icon -image1 $icon -sourceType "python"`;
+string $curPop = `popupMenu -parent $curBtn -button 1 -ctl 1`; // sh, alt, ctl
+menuItem -p $curPop -l "Reload" -c $reload_cmd -sourceType "python";
+
 print ("\n// "+$tool_info[1]+" has been added to current shelf.\n");
