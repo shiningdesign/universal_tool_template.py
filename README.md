@@ -31,6 +31,9 @@ Key Feature
 Change Log
 -------------
 * v010: 2017.03.13:
+  * (2017.04.20) replacing v9.4, with strong "template+userClass" concept
+  * rewrite some syntax, and provide more seperation on customization part
+  * all sample code has been taken out for clean template
   * complete rewrite to v9 and more slim code
 * v009.4: 2017.04.20
   * single desktop instance
