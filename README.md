@@ -30,7 +30,16 @@ Key Feature
 
 Change Log
 -------------
-
+* v010: 2017.03.13:
+  * complete rewrite to v9 and more slim code
+* v009.4: 2017.04.20
+  * single desktop instance
+* v009.3: 2017.02.20
+  * auto template builder compatiblility
+* v009: 2017.02.01
+  * a branch of v8.2 beta - ongoing, as it will use class inherient method
+  * instead of modify whole copy of the template class, which helps on nested template class UI and multiple class program
+  * just change the UserClassUI to your class name
 * v008.3: 2017.02.20
   * auto template builder compatiblility
 * v008.2.2: 2017.02.14
