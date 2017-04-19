@@ -1,4 +1,4 @@
-tpl_ver = 9.3
+tpl_ver = 9.4
 # Univeral Tool Template v009.3
 # by ying - https://github.com/shiningdesign/universal_tool_template.py
 
@@ -211,7 +211,7 @@ class UniversalToolUI(super_class):
             self.location = sys.executable
         else:
             # unfrozen
-            self.location = os.path.realpath(__file__) # location: ref: sys.modules[__name__].__file__
+            self.location = os.path.realpath(sys.modules[self.__class__.__module__].__file__)
             
         self.name = self.__class__.__name__
         self.iconPath = os.path.join(os.path.dirname(self.location),'icons',self.name+'.png')
