@@ -1,4 +1,4 @@
-tpl_ver = 10.0
+tpl_ver = 10.1
 print("tpl_ver: {}".format(tpl_ver))
 # Univeral Tool Template v010.0
 # by ying - https://github.com/shiningdesign/universal_tool_template.py
@@ -114,7 +114,7 @@ class UniversalToolUI(super_class):
             self.location = sys.executable
         else:
             # unfrozen
-            self.location = os.path.realpath(__file__) # location: ref: sys.modules[__name__].__file__
+            self.location = os.path.realpath(sys.modules[self.__class__.__module__].__file__)
             
         self.name = self.__class__.__name__
         self.iconPath = os.path.join(os.path.dirname(self.location),'icons',self.name+'.png')
@@ -256,7 +256,7 @@ class UniversalToolUI(super_class):
             
     def Establish_Connections(self):
         for ui_name in self.uiList.keys():
-            prefix = ui_name.rsplit('_', 1)[-1]
+            prefix = ui_name.rsplit('_', 1)[0]
             if ui_name.endswith('_btn'):
                 self.uiList[ui_name].clicked.connect(getattr(self, prefix+"_action", partial(self.default_action,ui_name)))
             elif ui_name.endswith('_atn'):
@@ -274,7 +274,7 @@ class UniversalToolUI(super_class):
     def default_action(self, ui_name):
         print("No action defined for this button: "+ui_name)
     def default_message(self, ui_name):
-        prefix = ui_name.rsplit('_', 1)[-1]
+        prefix = ui_name.rsplit('_', 1)[0]
         msgName = prefix+"_msg"
         msg_txt = msgName + " is not defined in uiList."
         if msgName in self.uiList:
@@ -388,7 +388,7 @@ class UniversalToolUI(super_class):
                 itemNameList = []
                 for i in range(itemCnt):
                     itemNameList.append(unicode(ui_element.itemText(i)))
-                self.memoData['lang']['default'][ui_name]=';'.join(tabNameList)
+                self.memoData['lang']['default'][ui_name]=';'.join(itemNameList)
             elif isinstance(ui_element, QtWidgets.QTreeWidget):
                 # uiType: QTreeWidget
                 labelCnt = ui_element.headerItem().columnCount()
@@ -918,6 +918,8 @@ class UniversalToolUI(super_class):
 #############################################
 # User Class creation
 #############################################
+version = '0.1'
+log = '''
 #------------------------------
 # How to Use: 
 # 1. change class name "UserClassUI"  to "YourToolName" in your editor,
@@ -926,15 +928,16 @@ class UniversalToolUI(super_class):
 #  - in icons folder, the Maya shelf icon should name as "YourPythonFileName.png", if you name all name the same, then 1 icon is enough
 # 3. load it up and run
 #------------------------------
-# loading template - Run in python panel
 '''
+help = '''
+# loading template - Run in python panel
 myPath='/path_to_universal_tool_or_custom_name/'
 import sys;myPath in sys.path or sys.path.append(myPath);
 import universal_tool_template
 universal_tool_template.main()
-'''
+
 # loading template - Run in system command console
-'''
+
 python universal_tool_template.py
 '''
 
@@ -948,8 +951,9 @@ class UserClassUI(UniversalToolUI):
         UniversalToolUI.__init__(self, parent)
         
         # class variables
-        self.version="0.1"
-        self.help = "(UserClassUI)How to Use:\n1. Put source info in\n2. Click Process button\n3. Check result output\n4. Save memory info into a file."
+        self.version= version
+        self.log = log
+        self.help = help
         
         # mode: example for receive extra user input as parameter
         self.mode = 0
@@ -1090,9 +1094,9 @@ class UserClassUI(UniversalToolUI):
         # import process
         ui_data = ""
         if file.endswith('.dat'):
-            ui_data = self.readFileData(file, binary=1)
+            ui_data = self.readDataFile(file, binary=1)
         else:
-            ui_data = self.readFileData(file)
+            ui_data = self.readDataFile(file)
         self.uiList['source_txt'].setText(ui_data)
         self.quickInfo("File: '"+file+"' loading finished.")
 
