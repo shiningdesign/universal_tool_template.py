@@ -235,9 +235,9 @@ now all the creation is using qui function
 |  | put user UI and info UI side by side in split, <br> child can be either a layout or widget | 
 | **QGroupBox** | `self.qui('user2_btn;User2 \| info2_btn;Info2', 'my_grp;vbox,Personal Data')` | 
 |  | put user UI and info UI inside "my_grp" group box and with internal vbox layout and title as "Personal Data" <br> Note:**no ,() in title** | 
-| **QWidget** | `self.qui('user_label;Name | user_input', 'user_widget;vbox')` |  
+| **QWidget** | `self.qui('user_label;Name \| user_input', 'user_widget;vbox')` |  
 |  | like Groupbox widget, but without a title, useful for hide show a set of UIs | 
-| **QTabWidget** | `self.qui('client_layout | product_layout', 'database_tab;h', '(Client,Product)')` |
+| **QTabWidget** | `self.qui('client_layout \| product_layout', 'database_tab;h', '(Client,Product)')` |
 |  | put client UI and product UI into database_tab tabwidget, as horizontal tab, with title as "Client", "Product", UI can be either widget or layout | 
 | | | 
 | **QPushButton** | `self.qui('my_btn;Submit')` |  
