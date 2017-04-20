@@ -242,7 +242,8 @@ now all the creation is using qui function
 | | | 
 | **QPushButton** | `self.qui('my_btn;Submit')` |  
 |  | create pushbutton with title "Submit" | 
-| ? | `self.qui('my_btnMsg')`  | 
+|  | `self.qui('my_btnMsg;Info')`  | 
+|  | create pushbutton with title "Info" with automatically pop up a dialog show text string stored in self.uiList['my_msg'] | 
 | **QLabel** | `self.qui('info_label;Please select all objects')` |  
 |  | a label with text "Please select all objects"  | 
 | **QLineEdit** | `self.qui('user_input;Your Email')` |  
@@ -263,7 +264,7 @@ now all the creation is using qui function
 |  | create a data table with column name as "Name", "Email", "Phone" | 
 | || 
 | **QSpacerItem** | `self.qui('user_space;(100,30,4,3)')` | 
-|  | create a space item with policy expanding horizontally and normal vertically <br> # 0 = fixed; 1 > min; 2 `< max; 3 = prefered; 4 = <expanding>`; 5 = expanding> Aggresive; 6=4 ignored size input | 
+|  | create a space item with policy expanding horizontally and normal vertically <br> # 0 = fixed; 1 > min; 2 \< max; 3 = prefered; 4 = \<expanding>; 5 = expanding> Aggresive; 6=4 ignored size input | 
 
 
 File Structure
@@ -371,10 +372,14 @@ python UITranslator.py
 
 ![uitranslator_v1.0.png](screenshot/uitranslator_v1.0.png?raw=true)
 
-#auto maya shelf installer v3.0 (install-v0.1_PythonToolName.mel)
+auto maya shelf installer v5.0 (install-v5.0_App.mel)
+-------------
+
   * a script template that automatically install its nearby python tool to shelf, with icon set as well, in a simple process of drag-n-drop into maya window.
 
 **feature and usage**:
+  * version 5.0 (2017.04.10)
+    * ctrl+ LMB click to pop "reload" submenu. Thus, no need reload and install, just 1 mel script to hold 2 features
   * version 3.0 (2016.12.20):
     * Fully auto install by this file name, example "install_Python_File_Name.mel" or "install_PythonFileName.mel"
     * the icon should be named as "Python_File_Name.png" or "PythonFileName" accordingly inside "icons" folder, your icon is (32x32) in size
@@ -383,5 +388,7 @@ python UITranslator.py
       * -overlayLabelColor 0 0 0 (0-1 means black to white) 
       * -overlayLabelBackColor 1 1 1 0.0 (last float 0-1 means hide-show for bg color )
 
-#cross-platform cx_Freeze binary build script
+cross-platform cx_Freeze binary build script
+-------------
+
   * just change the ToolName, and includes the folder or resource, then run buildScript in windows, mac, linux to create binary
