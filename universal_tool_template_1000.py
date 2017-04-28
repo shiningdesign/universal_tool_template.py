@@ -102,6 +102,7 @@ class UniversalToolUI(super_class):
         # class variables
         #------------------------------
         self.version = "0.1"
+        self.date = '2017.00.00'
         self.log = 'no version log in user class'
         self.help = 'no help guide in user class'
         
@@ -156,7 +157,7 @@ class UniversalToolUI(super_class):
             self.uiList['helpGuide_msg'] = self.help
             self.quickMenuAction('helpGuide_atnMsg','Usage Guide','How to Usge Guide.','helpGuide.png', cur_menu)
             self.uiList['helpLog_msg'] = self.log
-            self.quickMenuAction('helpLog_atnMsg','About','Vesion Log.','helpLog.png', cur_menu)
+            self.quickMenuAction('helpLog_atnMsg','About v{0} - {1}'.format(self.version, self.date),'Vesion Log.','helpLog.png', cur_menu)
     def setupWin(self):
         self.setWindowTitle(self.name + " - v" + self.version + " - host: " + hostMode)
         self.setWindowIcon(self.icon)
@@ -848,7 +849,7 @@ class UniversalToolUI(super_class):
             each_ui.setSizePolicy(policyList[w],policyList[h])
     
     def quickInfo(self, info):
-        self.statusBar().showMessage(info)            
+        self.statusBar().showMessage(info)
     def quickMsg(self, msg):
         tmpMsg = QtWidgets.QMessageBox() # for simple msg that no need for translation
         tmpMsg.setWindowTitle("Info")
@@ -1012,7 +1013,7 @@ class UserClassUI(UniversalToolUI):
         self.qui('source_txt | process_btn;Process and Update', 'upper_vbox')
         self.qui('upper_vbox | result_txt', 'input_split;v')
         self.qui('filePath_input | fileLoad_btn;Load | fileExport_btn;Export', 'fileBtn_layout;hbox')
-        self.qui('my_table | my_layout | input_split | entry_form | fileBtn_layout | pet_layout | my_grp', 'main_layout')
+        self.qui('my_layout | my_table | input_split | entry_form | fileBtn_layout | pet_layout | my_grp', 'main_layout')
         
         cur_table = self.uiList['my_table']
         cur_table.setRowCount(0)
