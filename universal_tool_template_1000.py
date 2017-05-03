@@ -108,6 +108,8 @@ class UniversalToolUI(super_class):
         
         self.uiList={} # for ui obj storage
         self.memoData = {} # key based variable data storage
+        self.memoData['font_size_default'] = QtGui.QFont().pointSize()
+        self.memoData['font_size'] = self.memoData['font_size_default']
         
         self.location = ""
         if getattr(sys, 'frozen', False):
@@ -364,6 +366,16 @@ class UniversalToolUI(super_class):
             f.write(txt)
         
     # ---- UI language functions ----
+    def fontNormal_action(self):
+        self.memoData['font_size'] = self.memoData['font_size_default']
+        self.setStyleSheet("QLabel,QPushButton { font-size: %dpt;}" % self.memoData['font_size'])
+    def fontUp_action(self):
+        self.memoData['font_size'] += 2
+        self.setStyleSheet("QLabel,QPushButton { font-size: %dpt;}" % self.memoData['font_size'])
+    def fontDown_action(self):
+        if self.memoData['font_size'] >= self.memoData['font_size_default']:
+            self.memoData['font_size'] -= 2
+            self.setStyleSheet("QLabel,QPushButton { font-size: %dpt;}" % self.memoData['font_size'])
     def loadLang(self):
         # store default language
         self.memoData['lang']={}
@@ -425,10 +437,10 @@ class UniversalToolUI(super_class):
         for filePath in [ x for x in glob.glob(os.path.join(lang_path,baseName+'_lang_*.json')) if os.path.isfile(x) ]:
             langName = re.findall(baseName+'_lang_(.+)\.json', os.path.basename(filePath))
             if len(langName) == 1:
-                langName = langName[0]
+                langName = langName[0].upper()
                 self.memoData['lang'][ langName ] = self.readDataFile( filePath )
                 if 'language_menu' in self.uiList:
-                    self.quickMenuAction(langName+'_atnLang', langName.upper(),'',langName + '.png', self.uiList['language_menu'])
+                    self.quickMenuAction(langName+'_atnLang', langName,'',langName + '.png', self.uiList['language_menu'])
                     self.uiList[langName+'_atnLang'].triggered.connect(partial(self.setLang,langName))
         # if no language file detected, add export default language option
         if isinstance(self, QtWidgets.QMainWindow) and len(self.memoData['lang']) == 1:
@@ -869,13 +881,25 @@ class UniversalToolUI(super_class):
     def quickFileAsk(self, type, ext=None):
         if ext == None:
             ext = "RAW data (*.json);;RAW binary data(*.dat);;Format Txt(*{0});;AllFiles(*.*)".format(self.fileType)
-        else:
-            if ext == '':
-                ext = "AllFiles(*.*)"
+        elif isinstance(ext, (str,unicode)):
+            if ';;' not in ext:
+                if ext == '':
+                    ext = 'AllFiles (*.*)'
+                else:
+                    ext = self.extFormat(ext) + ';;AllFiles (*.*)'
+        elif isinstance(ext, (tuple,list)):
+            if len(ext) > 0 and isinstance(ext[0], (tuple,list)):
+                tmp_list = [self.extFormat(x) for x in ext]
+                tmp_list.append('AllFiles (*.*)')
+                ext = ';;'.join(tmp_list)
             else:
-                if not ext.startswith('.'):
-                    ext = '.'+ext # standard ext ref format
-                ext = '{0}(*{0});;AllFiles(*.*)'.format(ext)
+                ext = ';;'.join([self.extFormat(x) for x in ext].append('AllFiles(*.*)')) 
+        elif isinstance(ext, dict):
+            tmp_list = [self.extFormat(x) for x in ext.items()]
+            tmp_list.append('AllFiles (*.*)')
+            ext = ';;'.join(tmp_list)
+        else:
+            ext = "AllFiles (*.*)"
         file = ""
         if type == 'export':
             file = QtWidgets.QFileDialog.getSaveFileName(self, "Save File","",ext)
@@ -920,6 +944,7 @@ class UniversalToolUI(super_class):
 # User Class creation
 #############################################
 version = '0.1'
+date = '2017.01.01'
 log = '''
 #------------------------------
 # How to Use: 
@@ -953,6 +978,7 @@ class UserClassUI(UniversalToolUI):
         
         # class variables
         self.version= version
+        self.date = date
         self.log = log
         self.help = help
         
@@ -974,8 +1000,8 @@ class UserClassUI(UniversalToolUI):
         self.setupWin()
         self.setupUI()
         self.Establish_Connections()
-        self.loadData()
         self.loadLang()
+        self.loadData()
         
     #------------------------------
     # overwrite functions
