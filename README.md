@@ -5,6 +5,8 @@ A quick Qt GUI tool development template for Maya, Houdini, Nuke, Blender, Deskt
 
 It automatically supports any combination of (Python 2.x, Python 3.x in 32bit and 64bit) with (PySide, PyQt4, PySide2, PyQt5)
 
+Detail Documentation at wiki: https://github.com/shiningdesign/universal_tool_template.py/wiki
+
 Key Feature
 -------------
 
