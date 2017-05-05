@@ -880,7 +880,7 @@ class UniversalToolUI(super_class):
             return (unicode(txt), ok)
     def quickFileAsk(self, type, ext=None):
         if ext == None:
-            ext = "RAW data (*.json);;RAW binary data(*.dat);;Format Txt(*{0});;AllFiles(*.*)".format(self.fileType)
+            ext = "RAW data (*.json);;RAW binary data (*.dat);;Format Txt (*{0});;AllFiles (*.*)".format(self.fileType)
         elif isinstance(ext, (str,unicode)):
             if ';;' not in ext:
                 if ext == '':
@@ -910,6 +910,14 @@ class UniversalToolUI(super_class):
         else:
             file = unicode(file) # for deal with pyqt case
         return file
+    def extFormat(self, ext):
+        if isinstance(ext, (tuple,list)):
+            ext = '{0} (*.{1})'.format(ext[1],ext[0])
+        else:
+            if ext.startswith('.'):
+                ext = ext[1:]
+            ext = '{0} (*.{0})'.format(ext)
+        return ext
     def quickFolderAsk(self):
         return unicode(QtWidgets.QFileDialog.getExistingDirectory(self, "Select Directory"))
     def mui_to_qt(self, mui_name):
