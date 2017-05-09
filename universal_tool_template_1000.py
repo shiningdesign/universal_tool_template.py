@@ -956,7 +956,7 @@ date = '2017.01.01'
 log = '''
 #------------------------------
 # How to Use: 
-# 1. change class name "UserClassUI"  to "YourToolName" in your editor,
+# 1. global replace class name "UserClassUI"  to "YourToolName" in your editor,
 #  - in icons folder, the Tool GUI icon should name as "YourToolName.png"
 # 2. change file name "universal_tool_template.py" to "YourPythonFileName.py",
 #  - in icons folder, the Maya shelf icon should name as "YourPythonFileName.png", if you name all name the same, then 1 icon is enough
