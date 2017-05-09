@@ -153,34 +153,7 @@ universal_tool_template.main() # no need this line for blender
 ```python
 python universal_tool_template.py
 ```
-    - automatically detect whether run in Maya panel mode or Desktop mode
-    - automatically detect to use PySide Qt binding or PyQt4 Qt binding
-    - universal coding format, seamlessly works in all 4 combination conditions
-    - built-in json file operation and format text operation
-    - built-in quickUI() v3.0 features
-    - built-in auto button action linking
-    - now quickSplitUI() supports more than 2 layouts or widgets
 
-**How to Use**
-
-  * Prepare into Your Tool:
-    1. global replace class name "UniversalToolUI"  to "YourToolName" in your editor,
-      * in icons folder, the Tool GUI icon should name as "YourToolName.png"
-    2. change file name "universal_tool_template.py" to "YourPythonFileName.py",
-      * in icons folder, the Maya shelf icon should name as "YourPythonFileName.png", if you name all name the same, then 1 icon is enough
-    3. load it up and run
-
-  * loading template - Run in Application's python panel:
-```python
-import sys;myPath='/path_to_universal_tool_or_custom_name/';myPath in sys.path or sys.path.append(myPath);
-import universal_tool_template
-universal_tool_template.main() # no need this line for blender 
-```
-
-  * loading template - Run in system command console
-```python
-python universal_tool_template.py
-```
 One-line Multi-UI Creation Syntax
 ===================
 
