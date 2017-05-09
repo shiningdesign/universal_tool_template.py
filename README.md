@@ -32,6 +32,20 @@ Key Feature
 
 Change Log
 -------------
+* v010.10: 2017.04.28
+  * add key of lang always upper()
+  * add global font size function
+  * switch loadLang and loadData
+  * better file filter browser
+* v010.11: 2017.04.25
+  * added date tracking for version
+  * added toggle Top flag in userClass
+* v010.10: 2017.04.19
+  * fix default_message, Establish_Connections function's prefix
+  * better log, help, version placement
+  * fix loadLang QCombo part
+  * fix readDataFile part
+  * better self location even with importing
 * v010: 2017.03.13:
   * (2017.04.20) replacing v9.4, with strong "template+userClass" concept
   * rewrite some syntax, and provide more seperation on customization part
@@ -106,14 +120,27 @@ Change Log
 
 ----------
 
-How to Use
+How to Use 
 -------------
+
+(for Version 9 and 10 and newer):
+1. change class name "UserClassUI"  to "YourToolName" in your editor,
+  - in icons folder, the Tool GUI icon should name as "YourToolName.png"
+2. change file name "universal_tool_template.py" to "YourPythonFileName.py",
+  - in icons folder, the Maya shelf icon should name as "YourPythonFileName.png", if you name all name the same, then 1 icon is enough
+3. load it up and run
+4. further edit:
+  * change the version, date, log, help variable before UserClassUI to update your app internal info
+
+(for Version 8 and older)
+```
   * Prepare into Your Tool:
     1. global replace class name "UniversalToolUI"  to "YourToolName" in your editor,
       * in icons folder, the Tool GUI icon should name as "YourToolName.png"
     2. change file name "universal_tool_template.py" to "YourPythonFileName.py",
       * in icons folder, the Maya shelf icon should name as "YourPythonFileName.png", if you name all name the same, then 1 icon is enough
     3. load it up and run
+```
 
   * loading template - Run in Application's python panel:
 ```python
