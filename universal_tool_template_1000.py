@@ -1,4 +1,5 @@
 tpl_ver = 10.1
+tpl_date = 70509
 print("tpl_ver: {}".format(tpl_ver))
 # Univeral Tool Template v010.0
 # by ying - https://github.com/shiningdesign/universal_tool_template.py
@@ -102,7 +103,7 @@ class UniversalToolUI(super_class):
         # class variables
         #------------------------------
         self.version = "0.1"
-        self.date = '2017.00.00'
+        self.date = '2017.01.01'
         self.log = 'no version log in user class'
         self.help = 'no help guide in user class'
         
@@ -154,7 +155,7 @@ class UniversalToolUI(super_class):
             self.quickMenuAction('helpHostMode_atnNone','Host Mode - {}'.format(hostMode),'Host Running.','', cur_menu)
             self.quickMenuAction('helpPyMode_atnNone','Python Mode - {}'.format(pyMode),'Python Library Running.','', cur_menu)
             self.quickMenuAction('helpQtMode_atnNone','Qt Mode - {}'.format(qtModeList[qtMode]),'Qt Library Running.','', cur_menu)
-            self.quickMenuAction('helpTemplate_atnNone','Universal Tool Teamplate - {}'.format(tpl_ver),'based on Univeral Tool Template v{0} by Shining Ying - https://github.com/shiningdesign/universal{1}tool{1}template.py'.format(tpl_ver,'_'),'', cur_menu)
+            self.quickMenuAction('helpTemplate_atnNone','Universal Tool Teamplate - {0}.{1}'.format(tpl_ver, tpl_date),'based on Univeral Tool Template v{0} by Shining Ying - https://github.com/shiningdesign/universal{1}tool{1}template.py'.format(tpl_ver,'_'),'', cur_menu)
             cur_menu.addSeparator()
             self.uiList['helpGuide_msg'] = self.help
             self.quickMenuAction('helpGuide_atnMsg','Usage Guide','How to Usge Guide.','helpGuide.png', cur_menu)
