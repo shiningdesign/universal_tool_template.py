@@ -1,5 +1,5 @@
 tpl_ver = 10.1
-tpl_date = 70509
+tpl_date = 70517
 print("tpl_ver: {}".format(tpl_ver))
 # Univeral Tool Template v010.0
 # by ying - https://github.com/shiningdesign/universal_tool_template.py
@@ -89,6 +89,7 @@ else:
     import _pickle as cPickle
 import re # for name pattern
 import ctypes # for windows instance detection
+import subprocess # for cmd call
 #------------------------------
 # user UI class choice
 #------------------------------
@@ -921,6 +922,24 @@ class UniversalToolUI(super_class):
         return ext
     def quickFolderAsk(self):
         return unicode(QtWidgets.QFileDialog.getExistingDirectory(self, "Select Directory"))
+    def openFolder(self, folderPath):
+        if os.path.isfile(folderPath):
+            folderPath = os.path.dirname(folderPath)
+        if os.path.isdir(folderPath):
+            cmd_list = None
+            if sys.platform == 'darwin':
+                cmd_list = ['open', '--', folderPath]
+            elif sys.platform == 'linux2':
+                cmd_list = ['xdg-open', '--', folderPath]
+            elif sys.platform in ['win32','win64']:
+                cmd_list = ['explorer', folderPath.replace('/','\\')]
+            if cmd_list != None:
+                try:
+                    subprocess.check_call(cmd_list)
+                except subprocess.CalledProcessError:
+                    pass # handle errors in the called executable
+                except OSError:
+                    pass # executable not found
     def mui_to_qt(self, mui_name):
         if hostMode != "maya":
             return
@@ -1088,7 +1107,27 @@ class UserClassUI(UniversalToolUI):
     # ---- user response list ----
     def loadData(self):
         print("Load data")
-    
+        # load user data
+        user_dirPath = os.path.join(os.path.expanduser('~'), 'Tool_Config', self.__class__.__name__)
+        user_setting_filePath = os.path.join(user_dirPath, 'setting.json')
+        if os.path.isfile(user_setting_filePath):
+            sizeInfo = self.readDataFile(user_setting_filePath)
+            self.setGeometry(*sizeInfo)
+    def closeEvent(self, event):
+        user_dirPath = os.path.join(os.path.expanduser('~'), 'Tool_Config', self.__class__.__name__)
+        if not os.path.isdir(user_dirPath):
+            try: 
+                os.makedirs(user_dirPath)
+            except OSError:
+                print('Error on creation user data folder')
+        if not os.path.isdir(user_dirPath):
+            print('Fail to create user dir.')
+            return
+        # save setting
+        geoInfo = self.geometry()
+        sizeInfo = [geoInfo.x(), geoInfo.y(), geoInfo.width(), geoInfo.height()]
+        user_setting_filePath = os.path.join(user_dirPath, 'setting.json')
+        self.writeDataFile(sizeInfo, user_setting_filePath)
     # - example button functions
     def process_action(self): # (optional)
         print("Process ....")
