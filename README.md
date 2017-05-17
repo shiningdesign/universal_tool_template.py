@@ -32,6 +32,9 @@ Key Feature
 
 Change Log
 -------------
+* v010.10: 2017.05.17
+  * add openFolder() and subprocess in template
+  * add (optional) position memory
 * v010.10: 2017.04.28
   * add key of lang always upper()
   * add global font size function
