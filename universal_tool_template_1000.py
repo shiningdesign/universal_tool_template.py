@@ -1,5 +1,5 @@
 tpl_ver = 10.1
-tpl_date = 70517
+tpl_date = 70518
 print("tpl_ver: {}".format(tpl_ver))
 # Univeral Tool Template v010.0
 # by ying - https://github.com/shiningdesign/universal_tool_template.py
@@ -1037,8 +1037,10 @@ class UserClassUI(UniversalToolUI):
     def setupMenu(self):
         self.quickMenu('file_menu;&File | setting_menu;&Setting | help_menu;&Help')
         cur_menu = self.uiList['setting_menu']
-        self.quickMenuAction('setParaA_atn','Set Parameter &A','A example of tip notice.','setParaA.png', cur_menu)
-        self.uiList['setParaA_atn'].setShortcut(QtGui.QKeySequence("Ctrl+R"))
+        for info in ['export', 'import']:
+            title = info.title()
+            self.quickMenuAction('{0}Config_atn'.format(info),'{0} Config (&{1})'.format(title,title[0]),'{0} Setting and Configuration.'.format(title),'{0}Config.png'.format(info), cur_menu)
+            self.uiList['{0}Config_atn'.format(info)].setShortcut(QtGui.QKeySequence("Ctrl+{0}".format(title[0])))
         cur_menu.addSeparator()
         super(self.__class__,self).setupMenu()
         
@@ -1107,12 +1109,32 @@ class UserClassUI(UniversalToolUI):
     # ---- user response list ----
     def loadData(self):
         print("Load data")
+        # load config
+        config = {}
+        config['root_name'] = 'root_default_name'
+        # overload config file if exists next to it
+        # then, save merged config into self.memoData['config']
+        prefix, ext = os.path.splitext(self.location)
+        config_file = prefix+'_config.json'
+        if os.path.isfile(config_file):
+            external_config = self.readDataFile(config_file)
+            print('info: External config file found.')
+            if isinstance( external_config, dict ):
+                self.memoData['config'] = self.dict_merge(config, external_config, addKey=1)
+                print('info: External config merged.')
+            else:
+                self.memoData['config'] = config
+                print('info: External config is not a dict and ignored.')
+        else:
+            self.memoData['config'] = config
+        
         # load user data
-        user_dirPath = os.path.join(os.path.expanduser('~'), 'Tool_Config', self.__class__.__name__)
+        user_dirPath = os.path.join(os.path.expanduser('~'), 'Tool_Data', self.__class__.__name__)
         user_setting_filePath = os.path.join(user_dirPath, 'setting.json')
         if os.path.isfile(user_setting_filePath):
             sizeInfo = self.readDataFile(user_setting_filePath)
             self.setGeometry(*sizeInfo)
+    
     def closeEvent(self, event):
         user_dirPath = os.path.join(os.path.expanduser('~'), 'Tool_Config', self.__class__.__name__)
         if not os.path.isdir(user_dirPath):
@@ -1128,51 +1150,70 @@ class UserClassUI(UniversalToolUI):
         sizeInfo = [geoInfo.x(), geoInfo.y(), geoInfo.width(), geoInfo.height()]
         user_setting_filePath = os.path.join(user_dirPath, 'setting.json')
         self.writeDataFile(sizeInfo, user_setting_filePath)
+        
+    def dict_merge(self, default_dict, extra_dict, addKey=0):
+        # dictionary merge, with optional adding extra data from extra_dict
+        new_dict = {}
+        for key in default_dict.keys():
+            if not isinstance( default_dict[key], dict ):
+                # value case
+                if key in extra_dict.keys():
+                    is_same_text_type = isinstance(extra_dict[key], (str,unicode)) and isinstance(default_dict[key], (str,unicode))
+                    is_same_non_text_type = type(extra_dict[key]) is type(default_dict[key])
+                    if is_same_text_type or is_same_non_text_type:
+                        print('use user value for key: '+key)
+                        new_dict[key] = extra_dict[key]
+                    else:
+                        new_dict[key] = default_dict[key]
+                else:
+                    new_dict[key] = default_dict[key]
+            else:
+                # dictionary case
+                if key in extra_dict.keys() and isinstance( extra_dict[key], dict ):
+                    new_dict[key] = self.dict_merge( default_dict[key], extra_dict[key], addKey )
+                else:
+                    new_dict[key] = default_dict[key]
+        # optional, add additional keys
+        if addKey == 1:
+            for key in [ x for x in extra_dict.keys() if x not in default_dict.keys() ]:
+                new_dict[key] = extra_dict[key]
+        return new_dict
+    
     # - example button functions
     def process_action(self): # (optional)
+        config = self.memoData['config']
         print("Process ....")
         source_txt = unicode(self.uiList['source_txt'].toPlainText())
         # 2: update memory
         self.memoData['data'] = [row.strip() for row in source_txt.split('\n')]
         print("Update Result")
-        txt='\n'.join([('>>: '+row) for row in self.memoData['data']])
+        txt=config['root_name']+'\n'+'\n'.join([('>>: '+row) for row in self.memoData['data']])
         self.uiList['result_txt'].setText(txt)
     
     # - example file io function
-    def fileExport_action(self):
-        filePath_input = self.uiList['filePath_input']
-        file = unicode(filePath_input.text())
-        if file == "":
-            file= self.quickFileAsk('export')
+    def exportConfig_action(self):
+        file= self.quickFileAsk('export', {'json':'JSON data file', 'xdat':'Pickle binary file'})
         if file == "":
             return
-        # update ui
-        filePath_input.setText(file)
         # export process
-        ui_data = unicode(self.uiList['source_txt'].toPlainText())
+        ui_data = self.memoData['config']
         # file process
-        if file.endswith('.dat'):
+        if file.endswith('.xdat'):
             self.writeDataFile(ui_data, file, binary=1)
         else:
             self.writeDataFile(ui_data, file)
         self.quickInfo("File: '"+file+"' creation finished.")
-    
-    def fileLoad_action(self):
-        filePath_input = self.uiList['filePath_input']
-        file=unicode(filePath_input.text())
-        if file == "":
-            file= self.quickFileAsk('import')
+    def importConfig_action(self):
+        file= self.quickFileAsk('import',{'json':'JSON data file', 'xdat':'Pickle binary file'})
         if file == "":
             return
-        # update ui
-        filePath_input.setText(file)
         # import process
         ui_data = ""
-        if file.endswith('.dat'):
+        if file.endswith('.xdat'):
             ui_data = self.readDataFile(file, binary=1)
         else:
             ui_data = self.readDataFile(file)
-        self.uiList['source_txt'].setText(ui_data)
+        self.memoData['config'] = ui_data
         self.quickInfo("File: '"+file+"' loading finished.")
 
 #############################################
