@@ -35,6 +35,7 @@ Change Log
 * v010.10: 2017.05.17
   * add openFolder() and subprocess in template
   * add (optional) position memory
+  * UserClassUI (optional) external config overload, and config export, import
 * v010.10: 2017.04.28
   * add key of lang always upper()
   * add global font size function
