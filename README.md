@@ -305,7 +305,12 @@ GearBox
   * a json dict file editor, for editing config dict file exported from template for external config file use.
   * it also can serve a lite or better version of UITranslator.py
   * you can also use it as a example of how universal_tool_template.py can be used to create tools
-  
+
+**screenshot**
+
+![GearBox_v1.0.png](screenshot/GearBox_v1.0.png?raw=true)
+![GearBox_v1.0_2.png](screenshot/GearBox_v1.0_2.png?raw=true)
+
 **usage**
   * run the GearBox_w.bat to start it if you have python on windows
   * load the json file from browser inside it,
