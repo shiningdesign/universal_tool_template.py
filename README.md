@@ -277,6 +277,7 @@ File Structure
 ===================
 
   * **universal_tool_template_VERSION.py**: main TEMPLATE and USERCLASS and MAIN()
+  * **GearBox**: a json config file editor for both language dict files and config export dict files from template.
   * **LNTextEdit.py**: (optional) if you want to use LNTextEdit in your tool.
   * **UITranslator.py**: (optional) a GUI tool to create translation json file from template's exported default language json
   * **install-v5.0_App.mel**: (optional) a quick Maya shelf installer that auto put python tool in maya shelf based on naming format and ctrl+RMB menu for reload your tool, good for code test
@@ -298,6 +299,27 @@ Screenshot
 
 File Structure in Details
 ===================
+
+GearBox
+-------------
+  * a json dict file editor, for editing config dict file exported from template for external config file use.
+  * it also can serve a lite or better version of UITranslator.py
+  * you can also use it as a example of how universal_tool_template.py can be used to create tools
+  
+**usage**
+  * run the GearBox_w.bat to start it if you have python on windows
+  * load the json file from browser inside it,
+  * click on the tree item to show in the bottom left preview text box, and use right text box to draft out your edit content and then copy paste into edit field on the tree, by double click the tree item.
+  * change the file name if you want to export as different file
+  * click export button below to save it
+
+**feature list**
+  * v001. (2017.04.17)
+    * support dict type json file only
+    * file loading and exporting
+    * add, remove tree branch
+    * edit the field and has a large preview text box to auto loading from selection
+    * show pure text for json text data, and show json format text for other type data in tree view
 
 LNTextEdit.py
 -------------
