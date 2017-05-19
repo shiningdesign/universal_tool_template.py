@@ -1161,7 +1161,7 @@ class UserClassUI(UniversalToolUI):
                     is_same_text_type = isinstance(extra_dict[key], (str,unicode)) and isinstance(default_dict[key], (str,unicode))
                     is_same_non_text_type = type(extra_dict[key]) is type(default_dict[key])
                     if is_same_text_type or is_same_non_text_type:
-                        print('use user value for key: '+key)
+                        print('use config file value for key: '+key)
                         new_dict[key] = extra_dict[key]
                     else:
                         new_dict[key] = default_dict[key]
