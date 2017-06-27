@@ -32,6 +32,10 @@ Key Feature
 
 Change Log
 -------------
+* v010.10: 2017.06.24
+  * update file name up to 1010
+  * add TreeWidget related operation inside (which not include in filename 1000)
+  * operations include Interchange among File Directory, Raw Data, Tree Structure with optional filtering and file version combining
 * v010.10: 2017.05.17
   * add openFolder() and subprocess in template
   * add (optional) position memory
