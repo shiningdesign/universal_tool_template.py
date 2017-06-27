@@ -1129,7 +1129,7 @@ class UserClassUI(UniversalToolUI):
             self.memoData['config'] = config
         
         # load user data
-        user_dirPath = os.path.join(os.path.expanduser('~'), 'Tool_Data', self.__class__.__name__)
+        user_dirPath = os.path.join(os.path.expanduser('~'), 'Tool_Config', self.__class__.__name__)
         user_setting_filePath = os.path.join(user_dirPath, 'setting.json')
         if os.path.isfile(user_setting_filePath):
             sizeInfo = self.readDataFile(user_setting_filePath)
