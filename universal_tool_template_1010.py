@@ -971,6 +971,13 @@ class UniversalToolUI(super_class):
                     pass # handle errors in the called executable
                 except OSError:
                     pass # executable not found
+    def openFile(self, filePath):
+        if sys.platform in ['win32','win64']:
+            os.startfile(filePath)
+        elif sys.platform == 'darwin':
+            os.open(filePath)
+        elif sys.platform == 'linux2':
+            os.xdg-open(filePath)
     def mui_to_qt(self, mui_name):
         if hostMode != "maya":
             return
