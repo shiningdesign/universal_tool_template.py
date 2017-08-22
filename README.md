@@ -32,6 +32,8 @@ Key Feature
 
 Change Log
 -------------
+* v010.10: 2017.08.22
+  * fix quickUI 3rd party class name generation
 * v010.10: 2017.06.24
   * update file name up to 1010
   * add TreeWidget related operation inside (which not include in filename 1000)
