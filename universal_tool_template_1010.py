@@ -1,5 +1,5 @@
 tpl_ver = 10.1
-tpl_date = 70627
+tpl_date = 70822
 print("tpl_ver: {}".format(tpl_ver))
 # Univeral Tool Template v010.1
 # by ying - https://github.com/shiningdesign/universal_tool_template.py
@@ -601,7 +601,7 @@ class UniversalToolUI(super_class):
                     ui_create_state = 0 # flag to track creation success
                     if not uiType[0] == 'Q':
                         # -- 3rd ui type, create like UI_Class.UI_Class()
-                        self.uiList[uiName] = getattr(eval(uiType), uiType)()
+                        self.uiList[uiName] = getattr(sys.modules[uiType], uiType)() # getattr(eval(uiType), uiType)()
                         ui_list.append(self.uiList[uiName])
                         ui_create_state = 1
                     else:
