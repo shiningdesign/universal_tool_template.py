@@ -1,5 +1,5 @@
 tpl_ver = 10.1
-tpl_date = 70822
+tpl_date = 70920
 print("tpl_ver: {}".format(tpl_ver))
 # Univeral Tool Template v010.1
 # by ying - https://github.com/shiningdesign/universal_tool_template.py
@@ -112,7 +112,8 @@ class UniversalToolUI(super_class):
         self.memoData = {} # key based variable data storage
         self.memoData['font_size_default'] = QtGui.QFont().pointSize()
         self.memoData['font_size'] = self.memoData['font_size_default']
-        
+        self.memoData['last_export'] = ''
+        self.memoData['last_import'] = ''
         self.location = ""
         if getattr(sys, 'frozen', False):
             # frozen - cx_freeze
@@ -933,15 +934,21 @@ class UniversalToolUI(super_class):
             ext = ';;'.join(tmp_list)
         else:
             ext = "AllFiles (*.*)"
-        file = ""
+        file = ''
         if type == 'export':
-            file = QtWidgets.QFileDialog.getSaveFileName(self, "Save File","",ext)
+            file = QtWidgets.QFileDialog.getSaveFileName(self, "Save File",self.memoData['last_export'],ext)
         elif type == 'import':
-            file = QtWidgets.QFileDialog.getOpenFileName(self, "Open File","",ext)
+            file = QtWidgets.QFileDialog.getOpenFileName(self, "Open File",self.memoData['last_import'],ext)
         if isinstance(file, (list, tuple)):
             file = file[0] # for deal with pyside case
         else:
             file = unicode(file) # for deal with pyqt case
+        # save last dir in memoData
+        if file != '':
+            if type == 'export':
+                self.memoData['last_export'] = os.path.dirname(file) #QFileInfo().path()
+            elif type == 'import':
+                self.memoData['last_import'] = os.path.dirname(file)
         return file
     def extFormat(self, ext):
         if isinstance(ext, (tuple,list)):
