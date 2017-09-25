@@ -1,11 +1,18 @@
-from GearBox_template_0903 import *
+from GearBox_template_1010 import *
 #############################################
 # User Class creation
 #############################################
+version = '1.1'
+date = '2017.09.25'
+log = '''
+2017.09.25
+  * update version with template 1010
+
 '''
-v001. 2017.04.17
-  * import and export with json dumps loads text format
+help = '''
+
 '''
+
 # --------------------
 #  user module list
 # --------------------
@@ -16,8 +23,10 @@ class GearBox(UniversalToolUI):
         UniversalToolUI.__init__(self, parent)
         
         # class variables
-        self.version="0.1"
-        self.help = "(GearBox)How to Use:\n1. Put source info in\n2. Click Process button\n3. Check result output\n4. Save memory info into a file."
+        self.version= version
+        self.date = date
+        self.log = log
+        self.help = help
         
         # mode: example for receive extra user input as parameter
         self.mode = 0
@@ -37,8 +46,8 @@ class GearBox(UniversalToolUI):
         self.setupWin()
         self.setupUI()
         self.Establish_Connections()
-        self.loadData()
         self.loadLang()
+        self.loadData()
         
     #------------------------------
     # overwrite functions
@@ -79,15 +88,13 @@ class GearBox(UniversalToolUI):
         
     def setupWin(self):
         super(self.__class__,self).setupWin()
-        self.setGeometry(500, 300, 500, 600) # self.resize(250,250)
+        self.setGeometry(500, 300, 250, 110) # self.resize(250,250)
         
     def setupUI(self):
         super(self.__class__,self).setupUI('grid')
         #------------------------------
         # user ui creation part
         #------------------------------
-        # + template: qui version since universal tool template v7
-        #   - no extra variable name, all text based creation and reference
         self.qui('source_txt | target_txt', 'write_layout;hbox')
         self.qui('filePath_input | fileLoad_btn;Load | fileExport_btn;Export', 'fileBtn_layout;hbox')
         self.qui('config_tree;(name,value,type) | write_layout', 'translate_split;v')
@@ -96,15 +103,20 @@ class GearBox(UniversalToolUI):
         self.uiList['config_tree'].setColumnWidth(0,180)
         #self.uiList['config_tree'].setColumnHidden(2,1)
         self.uiList['config_tree'].setDragEnabled(0)
-        #self.uiList['config_tree'].setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
+        self.uiList['config_tree'].setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
         
         self.memoData['tree_font_size'] = 10
         self.uiList['config_tree'].setStyleSheet("QTreeWidget { font-size: %dpt;}" % self.memoData['tree_font_size'])
-        
         #------------- end ui creation --------------------
         keep_margin_layout = ['main_layout']
+        keep_margin_layout_obj = []
+        # add tab layouts
+        for each in self.uiList.values():
+            if isinstance(each, QtWidgets.QTabWidget):
+                for i in range(each.count()):
+                    keep_margin_layout_obj.append( each.widget(i).layout() )
         for name, each in self.uiList.items():
-            if isinstance(each, QtWidgets.QLayout) and name not in keep_margin_layout and not name.endswith('_grp_layout'):
+            if isinstance(each, QtWidgets.QLayout) and name not in keep_margin_layout and not name.endswith('_grp_layout') and each not in keep_margin_layout_obj:
                 each.setContentsMargins(0, 0, 0, 0)
         self.quickInfo('Ready')
         # self.statusBar().hide()
@@ -113,9 +125,56 @@ class GearBox(UniversalToolUI):
         super(self.__class__,self).Establish_Connections()
         # custom ui response
         self.uiList['config_tree'].itemClicked[QtWidgets.QTreeWidgetItem,int].connect(self.config_tree_select_action)
+        # shortcut connection
+        self.hotkey = {}
+        # self.hotkey['my_key'] = QtWidgets.QShortcut(QtGui.QKeySequence( "Ctrl+1" ), self)
+        # self.hotkey['my_key'].activated.connect(self.my_key_func)
     # ---- user response list ----
     def loadData(self):
         print("Load data")
+        # load config
+        config = {}
+        config['root_name'] = 'root_default_name'
+        # overload config file if exists next to it
+        # then, save merged config into self.memoData['config']
+        prefix, ext = os.path.splitext(self.location)
+        config_file = prefix+'_config.json'
+        if os.path.isfile(config_file):
+            external_config = self.readDataFile(config_file)
+            print('info: External config file found.')
+            if isinstance( external_config, dict ):
+                self.memoData['config'] = self.dict_merge(config, external_config, addKey=1)
+                print('info: External config merged.')
+            else:
+                self.memoData['config'] = config
+                print('info: External config is not a dict and ignored.')
+        else:
+            self.memoData['config'] = config
+        
+        # load user data
+        user_dirPath = os.path.join(os.path.expanduser('~'), 'Tool_Config', self.__class__.__name__)
+        user_setting_filePath = os.path.join(user_dirPath, 'setting.json')
+        if os.path.isfile(user_setting_filePath):
+            sizeInfo = self.readDataFile(user_setting_filePath)
+            self.setGeometry(*sizeInfo)
+    
+    def closeEvent(self, event):
+        user_dirPath = os.path.join(os.path.expanduser('~'), 'Tool_Config', self.__class__.__name__)
+        if not os.path.isdir(user_dirPath):
+            try: 
+                os.makedirs(user_dirPath)
+            except OSError:
+                print('Error on creation user data folder')
+        if not os.path.isdir(user_dirPath):
+            print('Fail to create user dir.')
+            return
+        # save setting
+        geoInfo = self.geometry()
+        sizeInfo = [geoInfo.x(), geoInfo.y(), geoInfo.width(), geoInfo.height()]
+        user_setting_filePath = os.path.join(user_dirPath, 'setting.json')
+        self.writeDataFile(sizeInfo, user_setting_filePath)
+        
+   
     def config_tree_select_action(self):
         currentNode = self.uiList['config_tree'].currentItem()
         if currentNode:
@@ -228,6 +287,13 @@ class GearBox(UniversalToolUI):
                     return unicode(parent.child(0).text(1))
                 else:
                     return json.loads( unicode(parent.child(0).text(1)) )
+            else:
+                # general case
+                data = {}
+                for i in range(child_count):
+                    cur_node = parent.child(i)
+                    data[ unicode(cur_node.text(0)) ] = self.TreeToData(tree, cur_node)
+                return data
         else:
             data = {}
             for i in range(child_count):
@@ -249,9 +315,9 @@ class GearBox(UniversalToolUI):
         ui_data = self.TreeToData(self.uiList['config_tree'], self.uiList['config_tree'].invisibleRootItem())
         # file process
         if file.endswith('.dat'):
-            self.writeFileData(ui_data, file, binary=1)
+            self.writeDataFile(ui_data, file, binary=1)
         else:
-            self.writeFileData(ui_data, file)
+            self.writeDataFile(ui_data, file)
         self.quickInfo("File: '"+file+"' creation finished.")
     
     def fileLoad_action(self):
@@ -266,20 +332,20 @@ class GearBox(UniversalToolUI):
         # import process
         ui_data = []
         if file.endswith('.dat'):
-            ui_data = self.readFileData(file, binary=1)
+            ui_data = self.readDataFile(file, binary=1)
         else:
-            ui_data = self.readFileData(file)
+            ui_data = self.readDataFile(file)
         self.uiList['config_tree'].clear()
         self.DataToTree(self.uiList['config_tree'], self.uiList['config_tree'].invisibleRootItem(), ui_data)
         #self.quickTreeUpdate(self.uiList['config_tree'], ui_data)
         self.quickInfo("File: '"+file+"' loading finished.")
-        
+    
 
 #############################################
 # window instance creation
 #############################################
 
-single_UserClassUI = None
+single_GearBox = None
 def main(mode=0):
     # get parent window in Maya
     parentWin = None
@@ -291,23 +357,53 @@ def main(mode=0):
     # create app object for certain host
     app = None
     if hostMode in ("desktop", "blender"):
+        # single instance app mode on windows
+        if osMode == 'win':
+            # check if already open for single desktop instance
+            EnumWindows = ctypes.windll.user32.EnumWindows
+            EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int))
+            GetWindowText = ctypes.windll.user32.GetWindowTextW
+            GetClassName = ctypes.windll.user32.GetClassNameA
+            GetWindowTextLength = ctypes.windll.user32.GetWindowTextLengthW
+            IsWindowVisible = ctypes.windll.user32.IsWindowVisible
+            SetForegroundWindow = ctypes.windll.user32.SetForegroundWindow
+            titles = []
+            def foreach_window(hwnd, lParam):
+                if IsWindowVisible(hwnd):
+                    length = GetWindowTextLength(hwnd)
+                    buff = ctypes.create_unicode_buffer(length + 1)
+                    GetWindowText(hwnd, buff, length + 1)
+                    class_name = ctypes.create_string_buffer(200)
+                    GetClassName(hwnd, ctypes.byref(class_name), 200)
+                    titles.append( (buff.value, class_name.value, hwnd) )
+                return True
+            EnumWindows(EnumWindowsProc(foreach_window), 0)
+            winTitle = 'GearBox'
+            #winTitle = os.path.basename(os.path.dirname(__file__))
+            is_opened = 0
+            for x in titles:
+                if re.match(winTitle+' - v[0-9.]* - host: desktop',x[0]) and x[1] == 'QWidget':
+                    is_opened += 1
+                    if is_opened == 1:
+                        ctypes.windll.user32.SetForegroundWindow(x[2])
+                        return
         app = QtWidgets.QApplication(sys.argv)
     
     #--------------------------
     # ui instance
     #--------------------------
     # template 1 - Keep only one copy of windows ui in Maya
-    global single_UserClassUI
-    if single_UserClassUI is None:
+    global single_GearBox
+    if single_GearBox is None:
         if hostMode == "maya":
-            single_UserClassUI = GearBox(parentWin, mode)
+            single_GearBox = GearBox(parentWin, mode)
         elif hostMode == "nuke":
-            single_UserClassUI = GearBox(QtWidgets.QApplication.activeWindow(), mode)
+            single_GearBox = GearBox(QtWidgets.QApplication.activeWindow(), mode)
         else:
-            single_UserClassUI = GearBox()
+            single_GearBox = GearBox()
         # extra note: in Maya () for no parent; (parentWin,0) for extra mode input
-    single_UserClassUI.show()
-    ui = single_UserClassUI
+    single_GearBox.show()
+    ui = single_GearBox
     
     # template 2 - allow loading multiple windows of same UI in Maya
     '''
@@ -315,9 +411,8 @@ def main(mode=0):
         ui = GearBox(parentWin)
         ui.show()
     else:
-        
+        pass
     # extra note: in Maya () for no parent; (parentWin,0) for extra mode input
-    
     '''
     
     # loop app object for certain host
