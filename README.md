@@ -327,6 +327,9 @@ GearBox
   * click export button below to save it
 
 **feature list**
+  * v001.1 (2017.09.25)
+    * update GearBox to template 1010,
+    * fix export null error when there is single data entry in the config_tree and the data has a name
   * v001. (2017.04.17)
     * support dict type json file only
     * file loading and exporting
