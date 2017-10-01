@@ -1,5 +1,5 @@
 tpl_ver = 10.1
-tpl_date = 70920
+tpl_date = 71002
 print("tpl_ver: {}".format(tpl_ver))
 # Univeral Tool Template v010.1
 # by ying - https://github.com/shiningdesign/universal_tool_template.py
@@ -244,7 +244,21 @@ class UniversalToolUI(super_class):
             parent_creation_quickUI_input = ';'.join(parent_arg_list)
 
         self.quickUI(ui_creation_quickUI_list, parent_creation_quickUI_input, insert_opt)
-        
+    
+    def qui_menu(self, action_list_str, menu_str):
+        # for context menu quick creation
+        # syntax: self.qui_menu('right_menu_createFolder_atn;Create Folder | right_menu_openFolder_atn;Open Folder', 'right_menu')
+        self.uiList[menu_str] = QtWidgets.QMenu()
+        create_opt_list = [ x.strip() for x in action_list_str.split('|') ]
+        for each_creation in create_opt_list:
+            if ';' in each_creation:
+                option_list = [ x.strip() for x in each_creation.split(';') ]
+                self.uiList[option_list[0]] = QtWidgets.QAction(option_list[1], self)
+                self.uiList[menu_str].addAction(self.uiList[option_list[0]])
+            else:
+                self.uiList[each_creation] = QtWidgets.QAction('', self)
+                self.uiList[menu_str].addAction(self.uiList[each_creation])
+    
     def setupUI(self, layout='grid'):
         #------------------------------
         # main_layout auto creation for holding all the UI elements
@@ -277,8 +291,8 @@ class UniversalToolUI(super_class):
     #############################################
 
     #---- template response functions ----
-    def default_action(self, ui_name):
-        print("No action defined for this button: "+ui_name)
+    def default_action(self, ui_name, *argv):
+        print("No action defined for this UI element: "+ui_name)
     def default_message(self, ui_name):
         prefix = ui_name.rsplit('_', 1)[0]
         msgName = prefix+"_msg"
@@ -286,6 +300,9 @@ class UniversalToolUI(super_class):
         if msgName in self.uiList:
             msg_txt = self.uiList[msgName]
         self.quickMsg(msg_txt)
+    def default_menu_call(self, ui_name, point):
+        if ui_name in self.uiList.keys() and ui_name+'_menu' in self.uiList.keys():
+            self.uiList[ui_name+'_menu'].exec_(self.uiList[ui_name].mapToGlobal(point))
     
     ########################################
     ########################################
@@ -912,6 +929,24 @@ class UniversalToolUI(super_class):
         else:
             txt, ok = QtWidgets.QInputDialog.getItem(self, "Input", msg, choice, 0, 0)
             return (unicode(txt), ok)
+    def quickModKeyAsk(self):
+        modifiers = QtWidgets.QApplication.queryKeyboardModifiers()
+        clickMode = 0 # basic mode
+        if modifiers == QtCore.Qt.ControlModifier:
+            clickMode = 1 # ctrl
+        elif modifiers == QtCore.Qt.ShiftModifier:
+            clickMode = 2 # shift
+        elif modifiers == QtCore.Qt.AltModifier:
+            clickMode = 3 # alt
+        elif modifiers == QtCore.Qt.ControlModifier | QtCore.Qt.ShiftModifier | QtCore.Qt.AltModifier:
+            clickMode = 4 # ctrl+shift+alt
+        elif modifiers == QtCore.Qt.ControlModifier | QtCore.Qt.AltModifier:
+            clickMode = 5 # ctrl+alt
+        elif modifiers == QtCore.Qt.ControlModifier | QtCore.Qt.ShiftModifier:
+            clickMode = 6 # ctrl+shift
+        elif modifiers == QtCore.Qt.AltModifier | QtCore.Qt.ShiftModifier:
+            clickMode = 7 # alt+shift
+        return clickMode
     def quickFileAsk(self, type, ext=None):
         if ext == None:
             ext = "RAW data (*.json);;RAW binary data (*.dat);;Format Txt (*{0});;AllFiles (*.*)".format(self.fileType)
@@ -1560,32 +1595,37 @@ def main(mode=0):
         # single instance app mode on windows
         if osMode == 'win':
             # check if already open for single desktop instance
-            EnumWindows = ctypes.windll.user32.EnumWindows
-            EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int))
-            GetWindowText = ctypes.windll.user32.GetWindowTextW
-            GetClassName = ctypes.windll.user32.GetClassNameA
-            GetWindowTextLength = ctypes.windll.user32.GetWindowTextLengthW
-            IsWindowVisible = ctypes.windll.user32.IsWindowVisible
-            SetForegroundWindow = ctypes.windll.user32.SetForegroundWindow
-            titles = []
-            def foreach_window(hwnd, lParam):
-                if IsWindowVisible(hwnd):
-                    length = GetWindowTextLength(hwnd)
+            from ctypes import wintypes
+            order_list = []
+            result_list = []
+            top = ctypes.windll.user32.GetTopWindow(None)
+            if top: 
+                length = ctypes.windll.user32.GetWindowTextLengthW(top)
+                buff = ctypes.create_unicode_buffer(length + 1)
+                ctypes.windll.user32.GetWindowTextW(top, buff, length + 1)
+                class_name = ctypes.create_string_buffer(200)
+                ctypes.windll.user32.GetClassNameA(top, ctypes.byref(class_name), 200)
+                result_list.append( [buff.value, class_name.value, top ])
+                order_list.append(top)
+                while True:
+                    next = ctypes.windll.user32.GetWindow(order_list[-1], 2) # win32con.GW_HWNDNEXT
+                    if not next:
+                        break
+                    length = ctypes.windll.user32.GetWindowTextLengthW(next)
                     buff = ctypes.create_unicode_buffer(length + 1)
-                    GetWindowText(hwnd, buff, length + 1)
+                    ctypes.windll.user32.GetWindowTextW(next, buff, length + 1)
                     class_name = ctypes.create_string_buffer(200)
-                    GetClassName(hwnd, ctypes.byref(class_name), 200)
-                    titles.append( (buff.value, class_name.value, hwnd) )
-                return True
-            EnumWindows(EnumWindowsProc(foreach_window), 0)
-            winTitle = 'UserClassUI'
-            #winTitle = os.path.basename(os.path.dirname(__file__))
+                    ctypes.windll.user32.GetClassNameA(next, ctypes.byref(class_name), 200)
+                    result_list.append( [buff.value, class_name.value, next] )
+                    order_list.append(next)
+            # result_list: [(title, class, hwnd int)]
+            winTitle = 'UserClassUI' # os.path.basename(os.path.dirname(__file__))
             is_opened = 0
-            for x in titles:
-                if re.match(winTitle+' - v[0-9.]* - host: desktop',x[0]) and x[1] == 'QWidget':
+            for each in result_list:
+                if re.match(winTitle+' - v[0-9.]* - host: desktop',each[0]) and each[1] == 'QWidget':
                     is_opened += 1
                     if is_opened == 1:
-                        ctypes.windll.user32.SetForegroundWindow(x[2])
+                        ctypes.windll.user32.SetForegroundWindow(each[2])
                         return
         app = QtWidgets.QApplication(sys.argv)
     
