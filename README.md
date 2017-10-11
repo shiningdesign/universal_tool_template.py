@@ -33,6 +33,7 @@ Key Feature
 Change Log
 -------------
 * v010.10: 
+  * (2017.10.11) add return parent ui_name in qui(), which enabled nested qui creation
   * (2017.10.02) improve coding and more functions to handle context menu and multi-purpose in single function
   * (2017.09.20) add memoData of last_export and last_import for quickFileAsk to remember last directory
   * (2017.08.22) fix quickUI 3rd party class name generation
