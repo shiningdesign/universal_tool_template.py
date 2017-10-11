@@ -1,5 +1,5 @@
 tpl_ver = 10.1
-tpl_date = 71002
+tpl_date = 71011
 print("tpl_ver: {}".format(tpl_ver))
 # Univeral Tool Template v010.1
 # by ying - https://github.com/shiningdesign/universal_tool_template.py
@@ -244,7 +244,8 @@ class UniversalToolUI(super_class):
             parent_creation_quickUI_input = ';'.join(parent_arg_list)
 
         self.quickUI(ui_creation_quickUI_list, parent_creation_quickUI_input, insert_opt)
-    
+        return parent_uiName
+        
     def qui_menu(self, action_list_str, menu_str):
         # for context menu quick creation
         # syntax: self.qui_menu('right_menu_createFolder_atn;Create Folder | right_menu_openFolder_atn;Open Folder', 'right_menu')
