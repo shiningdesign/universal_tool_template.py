@@ -1,5 +1,5 @@
 tpl_ver = 10.1
-tpl_date = 71011
+tpl_date = 71012
 print("tpl_ver: {}".format(tpl_ver))
 # Univeral Tool Template v010.1
 # by ying - https://github.com/shiningdesign/universal_tool_template.py
@@ -249,16 +249,17 @@ class UniversalToolUI(super_class):
     def qui_menu(self, action_list_str, menu_str):
         # for context menu quick creation
         # syntax: self.qui_menu('right_menu_createFolder_atn;Create Folder | right_menu_openFolder_atn;Open Folder', 'right_menu')
-        self.uiList[menu_str] = QtWidgets.QMenu()
+        if menu_str not in self.uiList.keys():
+            self.uiList[menu_str] = QtWidgets.QMenu()
         create_opt_list = [ x.strip() for x in action_list_str.split('|') ]
         for each_creation in create_opt_list:
-            if ';' in each_creation:
-                option_list = [ x.strip() for x in each_creation.split(';') ]
-                self.uiList[option_list[0]] = QtWidgets.QAction(option_list[1], self)
-                self.uiList[menu_str].addAction(self.uiList[option_list[0]])
-            else:
-                self.uiList[each_creation] = QtWidgets.QAction('', self)
-                self.uiList[menu_str].addAction(self.uiList[each_creation])
+            options = [ x.strip() for x in each_creation.split(';') ]
+            atn_name = options[0]
+            atn_title = '' if len(options) < 2 else options[1]
+            if atn_name != '':
+                if atn_name not in self.uiList.keys():
+                    self.uiList[atn_name] = QtWidgets.QAction(atn_title, self)
+                self.uiList[menu_str].addAction(self.uiList[atn_name])
     
     def setupUI(self, layout='grid'):
         #------------------------------
