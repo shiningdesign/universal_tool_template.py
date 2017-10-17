@@ -32,6 +32,8 @@ Key Feature
 
 Change Log
 -------------
+* v010.20:
+  * (2017.10.17) a cleanup and restructure of template v10, especially those ui creation functions
 * v010.10: 
   * (2017.10.12) update qui_menu() to support append to menu if exists and existing atn check
   * (2017.10.11) add return parent ui_name in qui(), which enabled nested qui creation
