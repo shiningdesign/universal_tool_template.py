@@ -1,6 +1,6 @@
 # Univeral Tool Template v011.0
 tpl_ver = 10.2
-tpl_date = 171017
+tpl_date = 171026
 print("tpl_ver: {0}-{1}".format(tpl_ver, tpl_date))
 # by ying - https://github.com/shiningdesign/universal_tool_template.py
 
@@ -312,6 +312,22 @@ class UniversalToolUI(QtWidgets.QMainWindow):
             os.open(filePath)
         elif sys.platform == 'linux2':
             os.xdg-open(filePath)
+    def newFolder(self, parentPath, name=None):
+        created = 0
+        if name == None:
+            name, ok = self.quickMsgAsk('Enter the folder name:')
+            if not ok or name=='':
+                return
+        create_path = os.path.join(parentPath, name)
+        if os.path.isdir(create_path):
+            self.quickMsg('Already Exists')
+        else:
+            try: 
+                os.makedirs(create_path)
+                created = 1
+            except OSError:
+                self.quickMsg('Error on creation user data folder')
+        return created
     #=======================================
     # ui info functions
     #=======================================
@@ -665,6 +681,9 @@ class UniversalToolUI(QtWidgets.QMainWindow):
             elif isinstance(parent, QtWidgets.QMenu):
                 parent.addAction(self.uiList[ui_name])
         return ui_name
+    def qui_key(self, key_name, key_combo, func):
+        self.hotkey[key_name] = QtWidgets.QShortcut(QtGui.QKeySequence(key_combo), self)
+        self.hotkey[key_name].activated.connect( func )
     def qui_menubar(self, menu_list_str):
         if not isinstance(self, QtWidgets.QMainWindow):
             print("Warning: Only QMainWindow can have menu bar.")
@@ -1353,8 +1372,26 @@ class UniversalToolUI(QtWidgets.QMainWindow):
         self.uiList['dir_tree'].clear()
         self.DataToTree(self.uiList['dir_tree'], self.uiList['dir_tree'].invisibleRootItem(), ui_data)
         self.quickInfo("File: '"+file+"' loading finished.")
-        
-
+    def cache_tree(self, cur_tree_name, force=1):
+        cur_tree = self.uiList[cur_tree_name]
+        if 'cache' not in self.memoData:
+            self.memoData['cache'] = {}
+        if force == 1:
+            self.memoData['cache'][cur_tree_name] = self.TreeToData(cur_tree, cur_tree.invisibleRootItem())
+        else:
+            if cur_tree_name not in self.memoData['cache']:
+                self.memoData['cache'][cur_tree_name] = self.TreeToData(cur_tree, cur_tree.invisibleRootItem())
+    def filter_tree(self, cur_tree_name, word):
+        cur_tree = self.uiList[cur_tree_name]
+        parentNode = cur_tree.invisibleRootItem()
+        # read cache, if no cache, create cache
+        self.cache_tree(cur_tree_name, force = 0)
+        # filter and show, reset back to cache
+        cur_tree.clear()
+        if word != '':
+            self.DataToTree(cur_tree, parentNode, self.memoData['cache'][cur_tree_name], filter=word)
+        else:
+            self.DataToTree(cur_tree, parentNode, self.memoData['cache'][cur_tree_name])
 #############################################
 # User Class creation
 #############################################
@@ -1648,7 +1685,8 @@ def main(mode=0):
         # extra note: in Maya () for no parent; (parentWin,0) for extra mode input
     single_UserClassUI.show()
     ui = single_UserClassUI
-    
+    if osMode != 'desktop':
+        ui.activateWindow()
     # template 2 - allow loading multiple windows of same UI in Maya
     '''
     if hostMode == "maya":
