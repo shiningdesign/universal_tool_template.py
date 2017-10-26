@@ -33,6 +33,12 @@ Key Feature
 Change Log
 -------------
 * v010.20:
+  * (2017.10.26) some new functions
+    * newFolder(parentPath, name=None)
+    * qui_key(key_name, key_combo, func)
+    * cache_tree(cur_tree_name, force=1)
+    * filter_tree(cur_tree_name, word)
+    * bring to front if called again in tool mode
   * (2017.10.17) a cleanup and restructure of template v10, especially those ui creation functions
 * v010.10: 
   * (2017.10.12) update qui_menu() to support append to menu if exists and existing atn check
