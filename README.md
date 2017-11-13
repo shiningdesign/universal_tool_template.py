@@ -1,7 +1,7 @@
 universal_tool_template.py
 ===================
 
-A quick Qt GUI tool development template for Maya, Houdini, Nuke, Blender, Notepad++, Desktop;
+A quick Qt GUI tool development template for Maya, Houdini, Nuke, (BlackMagic) Fusion, Blender, Notepad++, Desktop;
 
 It automatically supports any combination of (Python 2.x, Python 3.x in 32bit and 64bit) with (PySide, PyQt4, PySide2, PyQt5)
 
@@ -13,7 +13,7 @@ Key Feature
 
 | Feature | Description |
 | :------------- |:-------------|
-| **Host Detection** | Maya, Houdini, Nuke, Blender, Notepad++, Desktop |
+| **Host Detection** | Maya, Houdini, Nuke, Fusion, Blender, Notepad++, Desktop |
 | **Python Detection** | 2.x, 3.x, 32bit, 64bit |
 | **Qt Binding Detection** | PySide, PyQt4, PySide2, PyQt5 |
 | **Universal Coding** | seamlessly works in above 2x2x4=16 combinations |
@@ -33,6 +33,7 @@ Key Feature
 Change Log
 -------------
 * v010.20:
+  * (2017.11.13) Blackmagic Fusion support added
   * (2017.11.13) notepad++ support for integration
     * blender3D support fix and code cleanup
     * python 3 add reload and unicode
@@ -316,6 +317,7 @@ Screenshot
 
 ![universal_tool_template_v10.2.png](screenshot/universal_tool_template_v10.2.png?raw=true)
 ![universal_tool_template_v10.2_blender.png](screenshot/universal_tool_template_v10.2_blender.png?raw=true)
+![universal_tool_template_v10.2_fusion.png](screenshot/universal_tool_template_v10.2_fusion.png?raw=true)
 ![universal_tool_template_v8.0.png](screenshot/universal_tool_template_v8.0.png?raw=true)
 ![universal_tool_template_v7.3.png](screenshot/universal_tool_template_v7.3.png?raw=true)
 ![universal_tool_template_v5.0.png](screenshot/universal_tool_template_v5.0.png?raw=true)
