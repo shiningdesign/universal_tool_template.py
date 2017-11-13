@@ -11,6 +11,7 @@ hostMode = ''
 hostModeList = [
     ['maya', {'mui':'maya.OpenMayaUI', 'cmds':'maya.cmds'} ],
     ['nuke', {'nuke':'nuke', 'nukescripts':'nukescripts'} ],
+    ['fusion', {'fs':'fusionscript'} ],
     ['houdini', {'hou':'hou'} ],
     ['blender', {'bpy':'bpy'} ],
     ['npp', {'Npp':'Npp'} ],
@@ -1644,7 +1645,7 @@ def main(mode=0):
             parentWin = sip.wrapinstance(long(mui.MQtUtil.mainWindow()), QtCore.QObject)
     # create app object for certain host
     global app_UserClassUI
-    if hostMode in ('desktop', 'blender', 'npp'):
+    if hostMode in ('desktop', 'blender', 'npp', 'fusion'):
         # single instance app mode on windows
         if osMode == 'win':
             # check if already open for single desktop instance
@@ -1680,7 +1681,7 @@ def main(mode=0):
                     if is_opened == 1:
                         ctypes.windll.user32.SetForegroundWindow(each[2])
                         return
-        if hostMode == 'npp':
+        if hostMode in ('npp','fusion'):
             app_UserClassUI = QtWidgets.QApplication([])
         else:
             app_UserClassUI = QtWidgets.QApplication(sys.argv)
@@ -1691,9 +1692,9 @@ def main(mode=0):
     # template 1 - Keep only one copy of windows ui in Maya
     global single_UserClassUI
     if single_UserClassUI is None:
-        if hostMode == "maya":
+        if hostMode == 'maya':
             single_UserClassUI = UserClassUI(parentWin, mode)
-        elif hostMode == "nuke":
+        elif hostMode == 'nuke':
             single_UserClassUI = UserClassUI(QtWidgets.QApplication.activeWindow(), mode)
         else:
             single_UserClassUI = UserClassUI()
@@ -1713,9 +1714,9 @@ def main(mode=0):
     '''
     
     # loop app object for certain host
-    if hostMode in ("desktop"):
+    if hostMode in ('desktop'):
         sys.exit(app_UserClassUI.exec_())
-    elif hostMode in ("npp"):
+    elif hostMode in ('npp','fusion'):
         app_UserClassUI.exec_()
     return ui
 
