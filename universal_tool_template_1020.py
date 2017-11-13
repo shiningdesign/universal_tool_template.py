@@ -1,6 +1,6 @@
 # Univeral Tool Template v011.0
 tpl_ver = 10.2
-tpl_date = 171026
+tpl_date = 171113
 print("tpl_ver: {0}-{1}".format(tpl_ver, tpl_date))
 # by ying - https://github.com/shiningdesign/universal_tool_template.py
 
@@ -13,6 +13,7 @@ hostModeList = [
     ['nuke', {'nuke':'nuke', 'nukescripts':'nukescripts'} ],
     ['houdini', {'hou':'hou'} ],
     ['blender', {'bpy':'bpy'} ],
+    ['npp', {'Npp':'Npp'} ],
 ]
 for name, libs in hostModeList:
     try:
@@ -58,7 +59,10 @@ print('Qt: {0}'.format(qtModeList[qtMode]))
 try:
     UNICODE_EXISTS = bool(type(unicode))
 except NameError:
-    unicode = lambda s: str(s)
+    # lambda s: str(s) # this works for function but not for class check
+    unicode = str
+if sys.version_info[:3][0]>=3:
+    reload = importlib.reload # add reload
 
 pyMode = '.'.join([ str(n) for n in sys.version_info[:3] ])
 print("Python: {0}".format(pyMode))
@@ -239,7 +243,7 @@ class UniversalToolUI(QtWidgets.QMainWindow):
         elif modifiers == QtCore.Qt.AltModifier | QtCore.Qt.ShiftModifier:
             clickMode = 7 # alt+shift
         return clickMode
-    def quickFileAsk(self, type, ext=None):
+    def quickFileAsk(self, type, ext=None, dir=None):
         if ext == None:
             ext = "RAW data (*.json);;RAW binary data (*.dat);;Format Txt (*{0});;AllFiles (*.*)".format(self.fileType)
         elif isinstance(ext, (str,unicode)):
@@ -263,9 +267,13 @@ class UniversalToolUI(QtWidgets.QMainWindow):
             ext = "AllFiles (*.*)"
         file = ''
         if type == 'export':
-            file = QtWidgets.QFileDialog.getSaveFileName(self, "Save File",self.memoData['last_export'],ext)
+            if dir == None:
+                dir = self.memoData['last_export']
+            file = QtWidgets.QFileDialog.getSaveFileName(self, "Save File",dir,ext)
         elif type == 'import':
-            file = QtWidgets.QFileDialog.getOpenFileName(self, "Open File",self.memoData['last_import'],ext)
+            if dir == None:
+                dir = self.memoData['last_import']
+            file = QtWidgets.QFileDialog.getOpenFileName(self, "Open File",dir,ext)
         if isinstance(file, (list, tuple)):
             file = file[0] # for deal with pyside case
         else:
@@ -669,12 +677,14 @@ class UniversalToolUI(QtWidgets.QMainWindow):
                         if atn_hotkey != '':
                             self.uiList[atn_name].setShortcut(QtGui.QKeySequence(atn_hotkey))
                     self.uiList[menu_str].addAction(self.uiList[atn_name])
-    def qui_atn(self, ui_name, title, tip=None, icon=None, parent=None):
+    def qui_atn(self, ui_name, title, tip=None, icon=None, parent=None, key=None):
         self.uiList[ui_name] = QtWidgets.QAction(title, self)
         if icon!=None:
             self.uiList[ui_name].setIcon(QtGui.QIcon(icon))
         if tip !=None:
             self.uiList[ui_name].setStatusTip(tip)
+        if key != None:
+            self.uiList[ui_name].setShortcut(QtGui.QKeySequence(key))
         if parent !=None:
             if isinstance(parent, (str, unicode)) and parent in self.uiList.keys():
                 self.uiList[parent].addAction(self.uiList[ui_name])
@@ -1623,6 +1633,7 @@ class UserClassUI(UniversalToolUI):
 #=======================================
 
 single_UserClassUI = None
+app_UserClassUI = None
 def main(mode=0):
     # get parent window in Maya
     parentWin = None
@@ -1632,8 +1643,8 @@ def main(mode=0):
         elif qtMode in (1,3): # PyQt
             parentWin = sip.wrapinstance(long(mui.MQtUtil.mainWindow()), QtCore.QObject)
     # create app object for certain host
-    app = None
-    if hostMode in ("desktop", "blender"):
+    global app_UserClassUI
+    if hostMode in ('desktop', 'blender', 'npp'):
         # single instance app mode on windows
         if osMode == 'win':
             # check if already open for single desktop instance
@@ -1669,7 +1680,10 @@ def main(mode=0):
                     if is_opened == 1:
                         ctypes.windll.user32.SetForegroundWindow(each[2])
                         return
-        app = QtWidgets.QApplication(sys.argv)
+        if hostMode == 'npp':
+            app_UserClassUI = QtWidgets.QApplication([])
+        else:
+            app_UserClassUI = QtWidgets.QApplication(sys.argv)
     
     #--------------------------
     # ui instance
@@ -1700,14 +1714,10 @@ def main(mode=0):
     
     # loop app object for certain host
     if hostMode in ("desktop"):
-        sys.exit(app.exec_())
-    
+        sys.exit(app_UserClassUI.exec_())
+    elif hostMode in ("npp"):
+        app_UserClassUI.exec_()
     return ui
 
 if __name__ == "__main__":
     main()
-
-if hostMode == "blender":
-    app = QtWidgets.QApplication(sys.argv)
-    ui = UserClassUI()
-    ui.show()
