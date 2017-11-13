@@ -1,7 +1,7 @@
 universal_tool_template.py
 ===================
 
-A quick Qt GUI tool development template for Maya, Houdini, Nuke, Blender, Desktop;
+A quick Qt GUI tool development template for Maya, Houdini, Nuke, Blender, Notepad++, Desktop;
 
 It automatically supports any combination of (Python 2.x, Python 3.x in 32bit and 64bit) with (PySide, PyQt4, PySide2, PyQt5)
 
@@ -33,7 +33,10 @@ Key Feature
 Change Log
 -------------
 * v010.20:
-  * (2017.11.13) add Notepad++ support
+  * (2017.11.13) notepad++ support for integration
+    * blender3D support fix and code cleanup
+    * python 3 add reload and unicode
+    * quickFileAsk(self, type, ext=None, dir=None) for location preset 
   * (2017.10.26) some new functions
     * newFolder(parentPath, name=None)
     * qui_key(key_name, key_combo, func)
@@ -312,6 +315,7 @@ Screenshot
 ===================
 
 ![universal_tool_template_v10.2.png](screenshot/universal_tool_template_v10.2.png?raw=true)
+![universal_tool_template_v10.2_blender.png](screenshot/universal_tool_template_v10.2_blender.png?raw=true)
 ![universal_tool_template_v8.0.png](screenshot/universal_tool_template_v8.0.png?raw=true)
 ![universal_tool_template_v7.3.png](screenshot/universal_tool_template_v7.3.png?raw=true)
 ![universal_tool_template_v5.0.png](screenshot/universal_tool_template_v5.0.png?raw=true)
