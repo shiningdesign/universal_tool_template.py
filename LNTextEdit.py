@@ -1,9 +1,11 @@
 '''
-LNTextEdit v4.0
+LNTextEdit v4.1
 Text widget with support for line numbers
 http://john.nachtimwald.com/2009/08/19/better-qplaintextedit-with-line-numbers/
 
 mod: by ying - http://shining-lucy.com/wiki
+v4.1
+ * fix qt5 qpallete code in qtgui
 v4.0
  * python 3 support
  * pyside, pyside2, pyqt4, pyqt5 support
@@ -222,7 +224,7 @@ class LNTextEdit(QtWidgets.QFrame):
         self.edit.setReadOnly(state)
     def setReadOnlyStyle(self, state):
         if state == 1:
-            mainWindowBgColor = QtWidgets.QPalette().color(QtWidgets.QPalette.Window)
+            mainWindowBgColor = QtGui.QPalette().color(QtGui.QPalette.Window)
             self.setStyleSheet('QPlainTextEdit[readOnly="true"] { background-color: %s;} QFrame {border: 0px}' % mainWindowBgColor.name() )
             self.setHighlight(0)
         else:
