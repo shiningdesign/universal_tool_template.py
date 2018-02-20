@@ -1,6 +1,6 @@
 # Univeral Tool Template v011.0
 tpl_ver = 10.2
-tpl_date = 171113
+tpl_date = 180220
 print("tpl_ver: {0}-{1}".format(tpl_ver, tpl_date))
 # by ying - https://github.com/shiningdesign/universal_tool_template.py
 
@@ -1683,6 +1683,8 @@ def main(mode=0):
                         return
         if hostMode in ('npp','fusion'):
             app_UserClassUI = QtWidgets.QApplication([])
+        elif hostMode in ('houdini'):
+            pass
         else:
             app_UserClassUI = QtWidgets.QApplication(sys.argv)
     
@@ -1701,7 +1703,7 @@ def main(mode=0):
         # extra note: in Maya () for no parent; (parentWin,0) for extra mode input
     single_UserClassUI.show()
     ui = single_UserClassUI
-    if osMode != 'desktop':
+    if hostMode != 'desktop':
         ui.activateWindow()
     # template 2 - allow loading multiple windows of same UI in Maya
     '''
