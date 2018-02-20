@@ -32,6 +32,11 @@ Key Feature
 
 Change Log
 -------------
+* v011.00:
+  * (2018.02.20) new yearly version out
+    * add input_check(). path_info() (better version of getPathChild)
+    * improve getPathChild() with pass re object for speedup
+    * remove old quickMenu() and quickMenuAction(), fully switched to qui_menubar, qui_menu, qui_atn
 * v010.20:
   * (2018.02.20) Fix launch code in Houdini since v8
   * (2017.11.13) Blackmagic Fusion support added
