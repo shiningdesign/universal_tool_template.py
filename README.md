@@ -297,6 +297,17 @@ now all the creation is using qui function
 | **QSpacerItem** | `self.qui('user_space;(100,30,4,3)')` | 
 |  | create a space item with policy expanding horizontally and normal vertically <br> # 0 = fixed; 1 > min; 2 \< max; 3 = prefered; 4 = \<expanding>; 5 = expanding> Aggresive; 6=4 ignored size input | 
 
+now all menu creation is using qui_atn,qui_menu,qui_menubar function (replaced quickMenuAction, quickMenu since v11)
+
+| menu element | syntax | 
+| --------- | ------------ |
+| **QMenu** | `self.qui_menu('right_menu_createFolder_atn;Create Folder,Ctrl+D | _ | right_menu_openFolder_atn;Open Folder', 'right_menu')` |
+|  | create a list of menu QAction with title and optional shortcut and form (into) a menu object, while _ means a seperator in menu |
+|  | `self.qui_menubar('file_menu;&File | setting_menu;&Setting | help_menu;&Help')` |
+|  | create a list of menu in menubar |
+| **QAction** | `self.qui_atn(ui_name, title, tip=None, icon=None, parent=None, key=None)` <br> `self.qui_atn('importConfig_atn','Import Config (&I)','Import Config Setting.','importConfig.png', 'setting_menu', 'Ctrl+I')`  |
+|  | create a detailed QAction with uiList name, title, tip, icon, optionally inside a menu; for simple menuAction creation, just use with qui_menu |
+
 
 File Structure
 ===================
