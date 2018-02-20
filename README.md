@@ -19,7 +19,7 @@ Key Feature
 | **Universal Coding** | seamlessly works in above 2x2x4=16 combinations |
 | **File IO Support** | json, cPicle binary, plain text |
 | **oneline multi-UI creation** | quickUI() v4.0; qui() v1.0 |
-| **one-stop UI management** | self.uiList, self.iconList |
+| **one-stop UI management** | self.uiList, self.iconList, self.hotkey |
 | **auto UI-Action bindinig** | button, menuItem, message button |
 | **auto Icon loading** | maya shelf icon, class name icon |
 | **Template Style Option** | standalone, frameless, trans-irregular, on-top |
@@ -33,6 +33,7 @@ Key Feature
 Change Log
 -------------
 * v010.20:
+  * (2018.02.20) Fix launch code in Houdini since v8
   * (2017.11.13) Blackmagic Fusion support added
   * (2017.11.13) notepad++ support for integration
     * blender3D support fix and code cleanup
@@ -318,6 +319,7 @@ Screenshot
 ![universal_tool_template_v10.2.png](screenshot/universal_tool_template_v10.2.png?raw=true)
 ![universal_tool_template_v10.2_blender.png](screenshot/universal_tool_template_v10.2_blender.png?raw=true)
 ![universal_tool_template_v10.2_fusion.png](screenshot/universal_tool_template_v10.2_fusion.png?raw=true)
+![universal_tool_template_v10.2_houdini.png](screenshot/universal_tool_template_v10.2_houdini.png?raw=true)
 ![universal_tool_template_v8.0.png](screenshot/universal_tool_template_v8.0.png?raw=true)
 ![universal_tool_template_v7.3.png](screenshot/universal_tool_template_v7.3.png?raw=true)
 ![universal_tool_template_v5.0.png](screenshot/universal_tool_template_v5.0.png?raw=true)
