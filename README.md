@@ -32,6 +32,8 @@ Key Feature
 
 Change Log
 -------------
+* v011.10:
+  * (2018.03.08) update TreeToData with filter on defined colume index, and path_info() added
 * v011.00:
   * (2018.02.20) new yearly version out
     * add input_check(). path_info() (better version of getPathChild)
