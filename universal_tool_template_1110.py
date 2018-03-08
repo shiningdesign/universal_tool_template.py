@@ -1429,7 +1429,7 @@ class UniversalToolUI(QtWidgets.QMainWindow):
             if cur_tree_name not in self.memoData['cache']:
                 self.memoData['cache'][cur_tree_name] = self.TreeToData(cur_tree, cur_tree.invisibleRootItem())
     def filter_tree(self, cur_tree_name, word):
-        self.filter_tree_col(cur_tree_name, 0, word):
+        self.filter_tree_col(cur_tree_name, 0, word)
     def filter_tree_col(self, cur_tree_name, col, word):
         word = unicode(word)
         cur_tree = self.uiList[cur_tree_name]
