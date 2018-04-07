@@ -1,9 +1,11 @@
 '''
-LNTextEdit v4.1
+LNTextEdit v4.2
 Text widget with support for line numbers
 http://john.nachtimwald.com/2009/08/19/better-qplaintextedit-with-line-numbers/
 
 mod: by ying - http://shining-lucy.com/wiki
+v4.2
+  * fix lineWrap cmd typo
 v4.1
  * fix qt5 qpallete code in qtgui
 v4.0
@@ -214,7 +216,7 @@ class LNTextEdit(QtWidgets.QFrame):
         self.edit.document().setModified(modified)
     
     def setLineWrapMode(self, mode):
-        self.edit.setLineWrapMode(mode)
+        self.setWrap(mode)
     def setWrap(self, state):
         if state == 0:
             self.edit.setLineWrapMode(QtWidgets.QPlainTextEdit.NoWrap)
