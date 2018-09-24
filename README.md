@@ -475,3 +475,6 @@ cross-platform cx_Freeze binary build script
 -------------
 
   * just change the ToolName, and includes the folder or resource, then run buildScript in windows, mac, linux to create binary
+```
+python ToolName_buildScript.py build
+```
