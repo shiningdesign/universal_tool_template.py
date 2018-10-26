@@ -32,6 +32,8 @@ Key Feature
 
 Change Log
 -------------
+* v011.12:
+  * (2018.10.26) auto add scroll for long (>25 lines) text in quickMsg; setAsUI for use template UI component, and option initialize loadLang without build menu.
 * v011.10:
   * (2018.03.08) update TreeToData with filter on defined colume index, and path_info() added
 * v011.00:
