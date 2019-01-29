@@ -32,6 +32,10 @@ Key Feature
 
 Change Log
 -------------
+* v011.15:
+  * (2019.01.29)
+    * add self.hotkey in init, and self.hotkey_action() to show list of hotkey
+    * fix long quickMsg(), and now can select text from it
 * v011.12:
   * (2018.10.26) auto add scroll for long (>25 lines) text in quickMsg; setAsUI for use template UI component, and option initialize loadLang without build menu.
 * v011.10:
