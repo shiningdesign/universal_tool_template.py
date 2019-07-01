@@ -196,6 +196,37 @@ universal_tool_template.main() # no need this line for blender
 python universal_tool_template.py
 ```
 
+Get PySide2 or PyQt5 for Blender
+-------------
+
+For Blender 2.7.8a win64, 2.7.9b win64 case
+
+1. install or get python 3.5.1 x64 (which is same version as Blender above)
+2. install PyQt5-Py3.5-Qt5.7-x64 for that python 3.5.1, from http://www.lfd.uci.edu/~gohlke/pythonlibs/#pyqt4
+3. once it is done, you can copy these folder/file from standalone python to blender python site package folder 
+4. restart blender, you should be able to call “from PyQt5 import QtWidgets,QtCore,QtGui” without issue
+
+```
+from Python35x64_DIR\Lib\site-packages to blender_DIR\2.79\python\lib\site-packages
+folder and file list:
+  * sip.pyd
+  * PyQt5
+  * sip-4.18.1.dist-info
+  * PyQt5-5.7.dist-info
+```
+
+Note:
+
+I use the pip method for blender's python, seem it install pip, pyside2, pyqt5 all fine, but when import, it always error “DLL can't load”
+
+1. get get-pip.py from https://pip.pypa.io/en/stable/installing/
+2. cd to blender-2.79b-windows64\2.79\python\bin
+3. paste get-pip.py there and run .\python.exe get-pip.py
+4. it installs fine, then .\python.exe -m pip install pyside2
+5. or pyqt5, it all install fine, but at the end, whenever import QtCore like that, it will error DLL load error
+6. at least the above copy paste from matching standalone python will work fine.
+
+
 One-line Multi-UI Creation Syntax
 ===================
 
