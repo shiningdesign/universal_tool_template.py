@@ -29,9 +29,41 @@ Key Feature
 | **Extension Features** | self location for script mode and app mode |
 | **Language Features** | auto Export and Load UI language json |
 
+Coming Soon
+-------------
+v2010 (beta testing stage):
+  * (2019.09.12) updateUI preset support choice and input
+  * (2019.08.08) add loadPreset()
+  * (2019.08.06) re-write 1116 based on lite_0101 into clean v2010. a 3yr cleanup
+    - drop module: cPickle, ctypes
+    - add template info into class variable
+    - drop method setupStyle into setupUI
+    - remove self.drag_position
+    - dropped qui_atn, will use mainly qui_menu
+    - improve quickFolderAsk to remember
+    - dropped all ui info functions, like input_text() and etc
+    - dropped mui_to_qt, qt_to_mui
+    - dropped all quickUI() related quick() functions
+    - move All Data/Tree related function to UserClass()
+    - remove self.mode in default
+    - 'my_grp;vbox;Personal Data' like qui() now take ';' for all multi-date creation, no more mix ; and ,
+    - main(): sys.exit(1) signal for complete the task when duplicated window detected.
+    - main(): remove multi-copy window case for maya
 
 Change Log
 -------------
+* v011.16 (2019.08.06 last collective update)
+  * quickInfo(self, info, force=0) will pop to top window instead of element level to display info on status bar unless w. force flag.
+  * quickMsg(self, msg, block=1, ask=0) added ask feature to get simple ok/cancel result for user
+  * quickFolderAsk(self,dir=None) added start find directory option
+  * openFolder(self, folderPath) fixed linux open explorer issue
+  * newFolder(self, parentPath, name=None) can take file path as input and auto create parent folder
+  * input_text(), input_int(),input_float() default allow feedback empty msg option now
+  * writeTextFile(self, txt, file, b=0) allow binary writing mode
+  * fontNormal_action(self, uiClass_list=[]) and so supported uiClass_list input to batch font change
+  * getPathChild(self, scanPath, pattern='', isfile=0) will handle path not exist issue
+  * quickTree(self, cur_node, node_data, editable=0) added for create add nodes into tree (tmp)
+  * self.memoData['settingUI']=[] added, to support remember user input value on UIs and store them into file before closing and optionally restore value for next start
 * v011.15:
   * (2019.01.29)
     * add self.hotkey in init, and self.hotkey_action() to show list of hotkey
