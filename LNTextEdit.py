@@ -200,10 +200,10 @@ class LNTextEdit(QtWidgets.QFrame):
     
     def text(self):
         return unicode(self.edit.toPlainText())
-        
+    def clear(self):
+        self.setText('')
     def getText(self):
         return unicode(self.edit.toPlainText())
- 
     def setText(self, text):
         self.edit.setPlainText(text)
     def insertText(self, text):
