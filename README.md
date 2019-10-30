@@ -29,9 +29,13 @@ Key Feature
 | **Extension Features** | self location for script mode and app mode |
 | **Language Features** | auto Export and Load UI language json |
 
-Coming Soon
+New Revolution of UTT - version 2000 series:
 -------------
-v2010 (beta testing stage):
+v2010 (public release):
+  * (2019.10.25) fix empty creation string issue
+  * (2019.10.03) 
+    - fix getPathChild() unicode path name by unicode scanPath
+    - add _tab position in settingUI
   * (2019.09.12) updateUI preset support choice and input
   * (2019.08.08) add loadPreset()
   * (2019.08.06) re-write 1116 based on lite_0101 into clean v2010. a 3yr cleanup
@@ -50,8 +54,9 @@ v2010 (beta testing stage):
     - main(): sys.exit(1) signal for complete the task when duplicated window detected.
     - main(): remove multi-copy window case for maya
 
-Change Log
+Archive Version of UTT - 1000 series
 -------------
+* v011.16 (2019.10.25) fix empty creation string issue
 * v011.16 (2019.08.06 last collective update)
   * quickInfo(self, info, force=0) will pop to top window instead of element level to display info on status bar unless w. force flag.
   * quickMsg(self, msg, block=1, ask=0) added ask feature to get simple ok/cancel result for user
