@@ -1,6 +1,6 @@
 # Univeral Tool Template v011.0
 tpl_ver = 11.16
-tpl_date = 190806
+tpl_date = 191025
 print("tpl_ver: {0}-{1}".format(tpl_ver, tpl_date))
 # by ying - https://github.com/shiningdesign/universal_tool_template.py
 
@@ -638,7 +638,7 @@ class UniversalToolUI(QtWidgets.QMainWindow):
         self.statusBar().hide()
         self.uiList['main_layout'].setContentsMargins(0, 0, 0, 0)
     def qui(self, ui_list_string, parent_ui_string='', insert_opt=''):
-        ui_creation_list = [ x.strip() for x in ui_list_string.split('|') ]
+        ui_creation_list = [ x.strip() for x in ui_list_string.split('|') if x.strip() !='']
         ui_creation_quickUI_list = []
         # ------------
         # - ui list
