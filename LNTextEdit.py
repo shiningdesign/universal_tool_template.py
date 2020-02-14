@@ -1,9 +1,11 @@
 '''
-LNTextEdit v4.2
+LNTextEdit v4.3
 Text widget with support for line numbers
 http://john.nachtimwald.com/2009/08/19/better-qplaintextedit-with-line-numbers/
 
 mod: by ying - http://shining-lucy.com/wiki
+v4.3 (2020.02.14): 
+  * add monoFont function
 v4.2
   * fix lineWrap cmd typo
 v4.1
@@ -208,6 +210,8 @@ class LNTextEdit(QtWidgets.QFrame):
         self.edit.setPlainText(text)
     def insertText(self, text):
         self.edit.insertPlainText(text)
+    def addText(self, text):
+        self.edit.setPlainText(self.edit.toPlainText()+text)
     def insertPlainText(self, text):
         self.insertText(text)
     def isModified(self):
@@ -245,6 +249,11 @@ class LNTextEdit(QtWidgets.QFrame):
         font = self.edit.document().defaultFont()
         font.setPointSize(8)
         self.edit.setFont(font)
+    def monoFont(self, state):
+        if state == 1:
+            self.edit.setStyleSheet('QPlainTextEdit {font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;}')
+        else:
+            self.edit.setStyleSheet('')
     def setZoom(self,mode):
         if mode == 0:
             self.edit.zoomWheelEnabled = 0
