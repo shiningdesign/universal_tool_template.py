@@ -33,10 +33,15 @@ Key Feature
 | **Extension Features** | self location for script mode and app mode |
 | **Language Features** | auto Export and Load UI language json |
 
+Widget Level of UTT:
+-------------
+v1010 (public release):
+  * (2020.06.15) release of lite version of UTT for widget implementation, as UTT is too big for little widget and UTT is designed for tool creation as main window (even though UTT still has widget mode).
+
 New Revolution of UTT - version 2000 series:
 -------------
 v2010 (public release):
-  * (2020.0) better support for houdini window integration, add _spin as QSpinBox, and _check value save for settingUI
+  * (2020.06.04) better support for houdini window integration, add _spin as QSpinBox, and _check value save for settingUI
   * (2019.10.25) fix empty creation string issue
   * (2019.10.03) 
     - fix getPathChild() unicode path name by unicode scanPath
