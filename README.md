@@ -7,6 +7,10 @@ It automatically supports any combination of (Python 2.x, Python 3.x in 32bit an
 
 Detail Documentation at wiki: https://github.com/shiningdesign/universal_tool_template.py/wiki
 
+ClassName.py
+===================
+The light-weight version of universal_tool_template.py, designed for widget level implementation but still with utt qui() features. 
+
 Key Feature
 -------------
 
@@ -32,6 +36,7 @@ Key Feature
 New Revolution of UTT - version 2000 series:
 -------------
 v2010 (public release):
+  * (2020.0) better support for houdini window integration, add _spin as QSpinBox, and _check value save for settingUI
   * (2019.10.25) fix empty creation string issue
   * (2019.10.03) 
     - fix getPathChild() unicode path name by unicode scanPath
