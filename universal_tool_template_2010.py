@@ -1,6 +1,6 @@
 # Univeral Tool Template v20.1
 tpl_ver = 20.10
-tpl_date = 191003
+tpl_date = 200604
 print("tpl_ver: {0}-{1}".format(tpl_ver, tpl_date))
 # by ying - https://github.com/shiningdesign/universal_tool_template.py
 
@@ -129,7 +129,7 @@ class UniversalToolUI(QtWidgets.QMainWindow):
         self.qui_core_dict = {
             'vbox': 'QVBoxLayout','hbox':'QHBoxLayout','grid':'QGridLayout', 'form':'QFormLayout',
             'split': 'QSplitter', 'grp':'QGroupBox', 'tab':'QTabWidget',
-            'btn':'QPushButton', 'btnMsg':'QPushButton', 'label':'QLabel', 'input':'QLineEdit', 'check':'QCheckBox', 'choice':'QComboBox',
+            'btn':'QPushButton', 'btnMsg':'QPushButton', 'label':'QLabel', 'input':'QLineEdit', 'check':'QCheckBox', 'choice':'QComboBox', 'spin':'QSpinBox',
             'txt': 'QTextEdit',
             'list': 'QListWidget', 'tree': 'QTreeWidget', 'table': 'QTableWidget',
             'space': 'QSpacerItem',
@@ -1091,6 +1091,8 @@ class UserClassUI(UniversalToolUI):
             for ui in self.memoData['settingUI']:
                 if ui.endswith('_choice'):
                     user_setting[ui] = unicode(self.uiList[ui].currentText())
+                elif ui.endswith('_check'):
+                    user_setting[ui] = self.uiList[ui].isChecked()
                 elif ui.endswith('_input'):
                     user_setting[ui] = unicode(self.uiList[ui].text())
                 elif ui.endswith('_tab'):
@@ -1106,6 +1108,8 @@ class UserClassUI(UniversalToolUI):
                     the_idx = self.uiList[ui_name].findText(preset[ui_name])
                     if the_idx != -1:
                         self.uiList[ui_name].setCurrentIndex(the_idx)
+            elif ui_name.endswith('_check'):
+                self.uiList[ui_name].setChecked(preset[ui_name])
             elif ui_name.endswith('_input'):
                 if preset[ui_name] != '':
                     self.uiList[ui_name].setText(preset[ui_name])
@@ -1221,6 +1225,9 @@ def main(mode=0):
             single_UserClassUI = UserClassUI(parentWin, mode)
         elif hostMode == 'nuke':
             single_UserClassUI = UserClassUI(QtWidgets.QApplication.activeWindow(), mode)
+        elif hostMode == 'houdini':
+            hou.session.mainWindow = hou.qt.mainWindow()
+            single_UserClassUI = UserClassUI(hou.session.mainWindow, mode)
         else:
             single_UserClassUI = UserClassUI()
     single_UserClassUI.show()
