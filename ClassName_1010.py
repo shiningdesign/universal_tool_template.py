@@ -7,12 +7,22 @@ v0.1:
   * base functions
 
 '''
-# ---- python 2,3 unicode ----
+# ---- base lib 2020.02.13----
+import os,sys
+# ---- pyMode 2020.02.13----
+# python 2,3 support unicode function
 try:
     UNICODE_EXISTS = bool(type(unicode))
 except NameError:
-    unicode = lambda s: str(s)
-# ---- qtMode ----
+    # unicode = lambda s: str(s) # this works for function but not for class check
+    unicode = str
+if sys.version_info[:3][0]>=3:
+    import importlib
+    reload = importlib.reload # add reload
+
+pyMode = '.'.join([ str(n) for n in sys.version_info[:3] ])
+print("Python: {0}".format(pyMode))
+# ---- qtMode 2020.02.13 ----
 qtMode = 0 # 0: PySide; 1 : PyQt, 2: PySide2, 3: PyQt5
 qtModeList = ('PySide', 'PyQt4', 'PySide2', 'PyQt5')
 try:
@@ -34,8 +44,6 @@ except ImportError:
             import sip
             qtMode = 3
 print('Qt: {0}'.format(qtModeList[qtMode]))
-# ---- base lib ----
-import os,sys
 # ---- user lib ----
 
 class ClassName(QtWidgets.QWidget):
