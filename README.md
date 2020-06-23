@@ -259,6 +259,7 @@ cd D:\YourPathToThat\blender-2.83.0-windows64\2.83\python\bin
 D:
 .\python.exe -m pip install PySide2
 ```
+![blender_2.83_pyside2.jpg](screenshot/blender_2.83_pyside2.jpg?raw=true)
 
 One-line Multi-UI Creation Syntax
 ===================
