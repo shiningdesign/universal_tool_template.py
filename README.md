@@ -1,7 +1,13 @@
 universal_tool_template.py
 ===================
 
-A quick Qt GUI tool development template for Maya, Houdini, Nuke, (BlackMagic) Fusion, Blender, Notepad++, Desktop;
+A quick Qt GUI tool development template for cross-platform standalone desktop tools, and sub-tools for python supported host applications, including
+  * Maya, Houdini, Nuke
+  * (BlackMagic) Fusion
+  * Blender (the free cross-platform 3D application, need install pyside2 as instructed below)
+  * Krita (the free Photoshop alternative)
+  * Notepad++ (the code editor, need PythonScript plugin installed)
+  * standalone desktop
 
 It automatically supports any combination of (Python 2.x, Python 3.x in 32bit and 64bit) with (PySide, PyQt4, PySide2, PyQt5)
 
@@ -407,6 +413,7 @@ File Structure
 Screenshot
 ===================
 
+![universal_tool_template_2010_krita.png](screenshot/universal_tool_template_2010_krita.png?raw=true)
 ![universal_tool_template_v10.2.png](screenshot/universal_tool_template_v10.2.png?raw=true)
 ![universal_tool_template_v10.2_blender.png](screenshot/universal_tool_template_v10.2_blender.png?raw=true)
 ![universal_tool_template_v10.2_fusion.png](screenshot/universal_tool_template_v10.2_fusion.png?raw=true)
