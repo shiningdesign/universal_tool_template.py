@@ -5,6 +5,7 @@ A quick Qt GUI tool development template for cross-platform standalone desktop t
   * Maya, Houdini, Nuke
   * (BlackMagic) Fusion
   * Blender (the free cross-platform 3D application, need install pyside2 as instructed below)
+  * Unreal 4.25 (the free game engine, need to install python plugin and pyside, instruction below)
   * Krita (the free Photoshop alternative)
   * Notepad++ (the code editor, need PythonScript plugin installed)
   * standalone desktop
@@ -47,6 +48,7 @@ v1010 (public release):
 New Revolution of UTT - version 2000 series:
 -------------
 v2010 (public release):
+  * (2020.07.14) better support for Krita window integration, add Unreal window integration
   * (2020.06.04) better support for houdini window integration, add _spin as QSpinBox, and _check value save for settingUI
   * (2019.10.25) fix empty creation string issue
   * (2019.10.03) 
@@ -266,6 +268,34 @@ D:
 .\python.exe -m pip install PySide2
 ```
 ![blender_2.83_pyside2.jpg](screenshot/blender_2.83_pyside2.jpg?raw=true)
+
+Get Python, PySide for Unreal 4.19 and 4.25 onwards
+-------------
+
+install Python for Unreal 4.19 and 4.25 onwards
+
+1. in Edit > Plugins : Scripting Tab, enable "Python Editor Script Plugin", and restart UE
+2. show it in Windows > Develop Tools > Output Log, you can switch the cmd to Python in the command box
+3. use code below to check the UE python path, and the python version it comes with
+
+```
+import sys
+pyMode = '.'.join([ str(n) for n in sys.version_info[:3] ])
+print("Python: {0}".format(pyMode))
+import os
+print(os)
+```
+install PySide for Unreal 4.19 and 4.25 onwards
+
+1. pip module is built-in with the python in UE, so you can install PySide/PySide2 using pip
+2. use above method to check path, it should be something like \my_path_to_version\UE_4.25\Engine\Binaries\ThirdParty\Python\Win64
+3. copy the path, and go commandline (type D: enter if your blender in D drive, C drive no need):
+4. for Mac and Linux, same, just cd to that directory, and do above. the drive letter thing is just for windows, if you prefer to put app in other drive
+5. after run command below in system cmd box, you should be able to import PySide or PySide2
+
+```
+.\python.exe -m pip install PySide
+```
 
 One-line Multi-UI Creation Syntax
 ===================
