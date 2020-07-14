@@ -48,7 +48,10 @@ v1010 (public release):
 New Revolution of UTT - version 2000 series:
 -------------
 v2010 (public release):
-  * (2020.07.14) better support for Krita window integration, add Unreal window integration
+  * (2020.07.14) 
+    - better support for Krita window integration
+    - add Unreal window integration
+    - add instruction in example Class and run code in example Class
   * (2020.06.04) better support for houdini window integration, add _spin as QSpinBox, and _check value save for settingUI
   * (2019.10.25) fix empty creation string issue
   * (2019.10.03) 
@@ -445,6 +448,8 @@ File Structure
 Screenshot
 ===================
 
+![utt_2010_200714_unreal.png](screenshot/utt_2010_200714_unreal.png?raw=true)
+![utt_2010_200714_krita.png](screenshot/utt_2010_200714_krita.png?raw=true)
 ![universal_tool_template_2010_krita.png](screenshot/universal_tool_template_2010_krita.png?raw=true)
 ![universal_tool_template_v10.2.png](screenshot/universal_tool_template_v10.2.png?raw=true)
 ![universal_tool_template_v10.2_blender.png](screenshot/universal_tool_template_v10.2_blender.png?raw=true)
