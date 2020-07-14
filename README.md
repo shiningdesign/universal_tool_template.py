@@ -294,6 +294,8 @@ install PySide for Unreal 4.19 and 4.25 onwards
 5. after run command below in system cmd box, you should be able to import PySide or PySide2
 
 ```
+cd D:\my_path_to_version\UE_4.25\Engine\Binaries\ThirdParty\Python\Win64
+D:
 .\python.exe -m pip install PySide
 ```
 
