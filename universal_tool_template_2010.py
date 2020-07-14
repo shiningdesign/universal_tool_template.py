@@ -1,6 +1,6 @@
 # Univeral Tool Template v20.1
 tpl_ver = 20.10
-tpl_date = 200604
+tpl_date = 200714
 print("tpl_ver: {0}-{1}".format(tpl_ver, tpl_date))
 # by ying - https://github.com/shiningdesign/universal_tool_template.py
 
@@ -14,6 +14,8 @@ hostModeList = [
     ['fusion', {'fs':'fusionscript'} ],
     ['houdini', {'hou':'hou'} ],
     ['blender', {'bpy':'bpy'} ],
+    ['krita', {'krita':'krita'} ],
+    ['unreal', {'unreal':'unreal'} ],
     ['npp', {'Npp':'Npp'} ],
 ]
 for name, libs in hostModeList:
@@ -914,11 +916,11 @@ date = '2019.07.05'
 log = '''
 #------------------------------
 v0.1: (2019.07.05)
-  * notes here
+  * for start, you can replace UserClassUI to YourOwnClassName in template to quickly create your own class
 #------------------------------
 '''
 help = '''
-wip
+import sys;myPath=r'/python_to_tool/UserClassUI/';myPath in sys.path or sys.path.append(myPath);import UserClassUI;UserClassUI.main()
 '''
 # --------------------
 #  user module list
@@ -1171,7 +1173,7 @@ def main(mode=0):
             parentWin = sip.wrapinstance(long(mui.MQtUtil.mainWindow()), QtCore.QObject)
     # create app object for certain host
     global app_UserClassUI
-    if hostMode in ('desktop', 'blender', 'npp', 'fusion'):
+    if hostMode in ('desktop', 'blender', 'unreal', 'npp', 'fusion'):
         # single instance app mode on windows
         if osMode == 'win':
             # check if already open for single desktop instance
@@ -1210,8 +1212,6 @@ def main(mode=0):
                         return
         if hostMode in ('npp','fusion'):
             app_UserClassUI = QtWidgets.QApplication([])
-        elif hostMode in ('houdini'):
-            pass
         else:
             app_UserClassUI = QtWidgets.QApplication(sys.argv)
     
@@ -1228,6 +1228,9 @@ def main(mode=0):
         elif hostMode == 'houdini':
             hou.session.mainWindow = hou.qt.mainWindow()
             single_UserClassUI = UserClassUI(hou.session.mainWindow, mode)
+        elif hostMode == 'unreal':
+            single_UserClassUI = UserClassUI()
+            unreal.parent_external_window_to_slate(single_UserClassUI.winId())
         else:
             single_UserClassUI = UserClassUI()
     single_UserClassUI.show()
