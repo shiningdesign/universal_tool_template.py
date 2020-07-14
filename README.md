@@ -24,7 +24,7 @@ Key Feature
 
 | Feature | Description |
 | :------------- |:-------------|
-| **Host Detection** | Maya, Houdini, Nuke, Fusion, Blender, Notepad++, Desktop |
+| **Host Detection** | Maya, Houdini, Nuke, Fusion, Blender, Unreal, Krita, Notepad++, Desktop |
 | **Python Detection** | 2.x, 3.x, 32bit, 64bit |
 | **Qt Binding Detection** | PySide, PyQt4, PySide2, PyQt5 |
 | **Universal Coding** | seamlessly works in above 2x2x4=16 combinations |
