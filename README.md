@@ -438,12 +438,11 @@ File Structure
   * **LNTextEdit.py**: (optional) if you want to use LNTextEdit in your tool.
   * **UITranslator.py**: (optional) a GUI tool to create translation json file from template's exported default language json
   * **install-v5.0_App.mel**: (optional) a quick Maya shelf installer that auto put python tool in maya shelf based on naming format and ctrl+RMB menu for reload your tool, good for code test
-  * **universal_tool_template.bat**: window console mode or window mode auto launcher, it detect whether to use launch with pythonw or python by the file name
-    * if you name as YourPythonFileName.bat, it will launch a console to run your Py
-    * if you name as YourPythonFileName_w.bat, it will use Pythonw to directly run your Py without pop-up console floating there
-    * if you name as YourPythonFileName_z.bat, it will launch without console in Python3 (change the py3 path inside)
-    * if you name as YourPythonFileName_x.bat, it will launch with console in Python3 (change the py3 path inside)
-
+  * **App_V9.bat**: window console mode or window mode auto launcher, it detect whether to use launch with pythonw or python by the file name
+    * if you name as YourPythonFileName.bat, it will launch a console to run your Py (use default system, if fail, fall back to cust python path list)
+    * if you name as YourPythonFileName_w.bat, it will use Pythonw to directly run your Py without pop-up console floating there (use default system, if fail, fall back to cust python path list)
+    * if you name as YourPythonFileName_z.bat, it will launch without console in your bat defined cust python path candidates (you can add py2,py3 path in custlist)
+    * if you name as YourPythonFileName_x.bat, it will launch with console in your bat defined cust python path candidates (you can add py2,py3 path in custlist)
 
 Screenshot
 ===================
