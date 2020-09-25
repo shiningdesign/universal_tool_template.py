@@ -17,16 +17,6 @@ Detail Documentation at wiki: https://github.com/shiningdesign/universal_tool_te
 ClassName.py
 ===================
 The light-weight version of universal_tool_template.py, designed for widget level implementation but still with utt qui() features. 
-  * (2020.09.25) update qui() to support tab, tree creation
-  * (2020.08.14) add more standard default function and code template
-  * (2020.06.15) add spin box
-  * (2020.06.13) add _grp layout object creation
-  * (2020.03.20) add qui_menu/default_menu_call
-  * (2020.03.02) fix _space support in addItem during layout
-  * (2020.02.03-25) support _space,_txt creation
-  * (2020.01.20) add qui_menu/default_menu_call functions, optional import partial
-  * (2020.01.08) support spacer item creation; add partial import
-  * (2019.10.15) replaced lite_0101 as widget level lite implementation
 
 Key Feature
 -------------
@@ -53,7 +43,19 @@ Key Feature
 Widget Level of UTT:
 -------------
 v1010 (public release):
+  * (2020.09.25) update qui() to support tab, tree creation
+  * (2020.08.14) add more standard default function and code template
   * (2020.06.15) release of lite version of UTT for widget implementation, as UTT is too big for little widget and UTT is designed for tool creation as main window (even though UTT still has widget mode).
+  * --- pre test stage
+  * (2020.06.15) add spin box
+  * (2020.06.13) add _grp layout object creation
+  * (2020.03.20) add qui_menu/default_menu_call
+  * (2020.03.02) fix _space support in addItem during layout
+  * (2020.02.03-25) support _space,_txt creation
+  * (2020.01.20) add qui_menu/default_menu_call functions, optional import partial
+  * (2020.01.08) support spacer item creation; add partial import
+  * (2019.10.15) replaced lite_0101 as widget level lite implementation
+  
 
 New Revolution of UTT - version 2000 series:
 -------------
