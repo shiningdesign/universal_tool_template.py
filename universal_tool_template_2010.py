@@ -1,6 +1,6 @@
 # Univeral Tool Template v20.1
 tpl_ver = 20.10
-tpl_date = 200714
+tpl_date = 200908
 print("tpl_ver: {0}-{1}".format(tpl_ver, tpl_date))
 # by ying - https://github.com/shiningdesign/universal_tool_template.py
 
@@ -212,9 +212,11 @@ class UniversalToolUI(QtWidgets.QMainWindow):
         pass
     def quickInfo(self, info, force=0):
         if hasattr( self.window(), "quickInfo") and force == 0:
-            self.window().statusBar().showMessage(info)
+            if hasattr(self.window(), 'statusBar'):
+                self.window().statusBar().showMessage(info)
         else:
-            self.statusBar().showMessage(info)
+            if hasattr(self, 'statusBar'):
+                self.statusBar().showMessage(info)
     def quickMsg(self, msg, block=1, ask=0):
         tmpMsg = QtWidgets.QMessageBox(self) # for simple msg that no need for translation
         tmpMsg.setWindowTitle("Info")
@@ -1012,8 +1014,10 @@ class UserClassUI(UniversalToolUI):
         self.qui('filePath_input | fileLoad_btn;Load | fileExport_btn;Export', 'fileBtn_layout;hbox')
         self.qui('input_split | fileBtn_layout', 'main_layout')
         '''
+        #------------------------------
+        # user ui creation part END
+        #------------------------------
         self.memoData['settingUI']=[]
-        #------------- end ui creation --------------------
         keep_margin_layout = ['main_layout']
         keep_margin_layout_obj = []
         # add tab layouts
@@ -1038,8 +1042,16 @@ class UserClassUI(UniversalToolUI):
     def loadData(self):
         print("Load data")
         # load config
+        
+        #------------------------------
+        #  user config
+        #------------------------------
         config = {}
         config['root_name'] = 'root_default_name'
+        #------------------------------
+        #  user config END
+        #------------------------------
+        
         # overload config file if exists next to it
         # then, save merged config into self.memoData['config']
         prefix, ext = os.path.splitext(self.location)
@@ -1102,7 +1114,6 @@ class UserClassUI(UniversalToolUI):
             user_setting_filePath = os.path.join(user_dirPath, 'setting.json')
             self.writeDataFile(user_setting, user_setting_filePath)
         
-    # - example button functions
     def updateUI(self, preset):
         for ui_name in preset:
             if ui_name.endswith('_choice'):
@@ -1117,6 +1128,11 @@ class UserClassUI(UniversalToolUI):
                     self.uiList[ui_name].setText(preset[ui_name])
             elif ui_name.endswith('_tab'):
                 self.uiList[ui_name].setCurrentIndex(preset[ui_name])
+    
+    #=======================================
+    #  user functions
+    #=======================================
+
     def process_action(self): # (optional)
         config = self.memoData['config']
         print("Process ....")
@@ -1127,6 +1143,11 @@ class UserClassUI(UniversalToolUI):
         txt=config['root_name']+'\n'+'\n'.join([('>>: '+row) for row in self.memoData['data']])
         self.uiList['result_txt'].setText(txt)
     
+    
+    #=======================================
+    #  user functions END
+    #=======================================
+
     # - example file io function
     def exportConfig_action(self):
         file= self.quickFileAsk('export', {'json':'JSON data file', 'xdat':'Pickle binary file'})
