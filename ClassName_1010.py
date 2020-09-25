@@ -1,5 +1,5 @@
 '''
-template version: utt.Class_1010_20200615
+template version: utt.Class_1010_20200925
 ClassName:
   * description
   
@@ -44,7 +44,39 @@ except ImportError:
             import sip
             qtMode = 3
 print('Qt: {0}'.format(qtModeList[qtMode]))
+# ---- hostMode 2020.02.13----
+import importlib
+hostMode = ''
+hostModeList = [
+    ['maya', {'mui':'maya.OpenMayaUI', 'cmds':'maya.cmds'} ],
+    ['nuke', {'nuke':'nuke', 'nukescripts':'nukescripts'} ],
+    ['fusion', {'fs':'fusionscript'} ],
+    ['houdini', {'hou':'hou'} ],
+    ['blender', {'bpy':'bpy'} ],
+    ['npp', {'Npp':'Npp'} ],
+]
+for name, libs in hostModeList:
+    try:
+        for x in libs.keys():
+            globals()[x] = importlib.import_module(libs[x])
+        hostMode = name
+        break
+    except ImportError:
+        pass
+if hostMode == '':
+    hostMode = 'desktop'
+print('Host: {0}'.format(hostMode))
+# ---- osMode 2020.02.13----
+osMode = 'other'
+if sys.platform in ['win32','win64']:
+    osMode = 'win'
+elif sys.platform == 'darwin':
+    osMode = 'mac'
+elif sys.platform == 'linux2':
+    osMode = 'linux'
+print("OS: {0}".format(osMode))
 # ---- user lib ----
+from functools import partial
 
 class ClassName(QtWidgets.QWidget):
     def __init__(self, parent=None,mode=0):
@@ -58,7 +90,7 @@ class ClassName(QtWidgets.QWidget):
         self.memoData['last_browse']=''
         # UI
         self.uiList={}
-        self.uiList['main_layout']=QtWidgets.QHBoxLayout();
+        self.uiList['main_layout']=QtWidgets.QHBoxLayout()
         self.uiList['main_layout'].setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.uiList['main_layout'])
         
@@ -73,11 +105,23 @@ class ClassName(QtWidgets.QWidget):
         for ui_name in self.uiList.keys():
             prefix = ui_name.rsplit('_', 1)[0]
             if ui_name.endswith('_btn'):
-                if hasattr(self, prefix+"_action"):
-                    self.uiList[ui_name].clicked.connect(getattr(self, prefix+"_action"))
+                self.uiList[ui_name].clicked.connect(getattr(self, prefix+"_action", partial(self.default_action,ui_name)))
+            elif ui_name.endswith('_atn'):
+                self.uiList[ui_name].triggered.connect(getattr(self, prefix+"_action", partial(self.default_action,ui_name)))
         # drop support
         self.uiList['main_input'].installEventFilter(self)
-    
+        # menu
+        for tree_name in []:
+            cur_tree = self.uiList[tree_name]
+            # --- tree interaction
+            cur_tree.itemDoubleClicked.connect( getattr(self, tree_name+'_open_action', partial(self.default_tree_open_action,tree_name) ) )
+            cur_tree.itemClicked[QtWidgets.QTreeWidgetItem,int].connect( getattr(self, tree_name+'_select_action', partial(self.default_tree_select_action,tree_name) ) )
+            # --- folder tree menu 
+            cur_tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+            cur_tree.customContextMenuRequested.connect( partial(self.default_menu_call,tree_name) )
+    def default_action(self, ui_name, *argv):
+        print("No action defined for this button: "+ui_name)
+            
     def eventFilter(self, object, event):
         # the main window event filter function
         if event.type() == QtCore.QEvent.DragEnter:
@@ -96,6 +140,11 @@ class ClassName(QtWidgets.QWidget):
             return 1
         return 0
         
+    # ---- tree functions ----
+    def default_tree_open_action(self, tree_name, *argv):
+        pass
+    def default_tree_select_action(self, tree_name, item=None, col=0):
+        pass
     # ---- user functions ----
     
     # ---- core functions ----
@@ -128,7 +177,8 @@ class ClassName(QtWidgets.QWidget):
     def default_menu_call(self, ui_name, point):
         if ui_name in self.uiList.keys() and ui_name+'_menu' in self.uiList.keys():
             self.uiList[ui_name+'_menu'].exec_(self.uiList[ui_name].mapToGlobal(point))
-    def qui(self, ui_str, layout_str):
+    def qui(self, ui_str, layout_str, opt=''):
+        # qui---(ver: 2020.09.25)
         ui_str_list = [x.strip() for x in ui_str.split('|') if x.strip()]
         ui_list = []
         for ui in ui_str_list:
@@ -192,6 +242,10 @@ class ClassName(QtWidgets.QWidget):
                 self.uiList[layout_str].setLayout(self.uiList[layout_str+'_layout'])
                 # pass grp layout
                 layout_str = layout_str+'_layout'
+            elif layout_str.endswith('_tab'):
+                self.uiList[layout_str]=QtWidgets.QTabWidget()
+                if layout_option == 'v':
+                    self.uiList[layout_str].setTabPosition(QtWidgets.QTabWidget.West)
             else:
                 if layout_option == 'vbox':
                     self.uiList[layout_str] = QtWidgets.QVBoxLayout()
@@ -200,18 +254,35 @@ class ClassName(QtWidgets.QWidget):
                 else:
                     return
         cur_layout = self.uiList[layout_str]
-        if not isinstance(cur_layout, QtWidgets.QBoxLayout):
+        if isinstance(cur_layout, QtWidgets.QBoxLayout):
+            for ui in ui_list:
+                ui_option = ''
+                if ';' in ui:
+                    ui,ui_option = ui.split(';',1)
+                if isinstance(self.uiList[ui], QtWidgets.QWidget):
+                    cur_layout.addWidget(self.uiList[ui])
+                elif isinstance(self.uiList[ui], QtWidgets.QSpacerItem):
+                    cur_layout.addItem(self.uiList[ui])
+                elif isinstance(self.uiList[ui], QtWidgets.QLayout):
+                    cur_layout.addLayout(self.uiList[ui])
+        elif isinstance(cur_layout, QtWidgets.QTabWidget):
+            tab_names = []
+            if opt!='':
+                tab_names = opt.replace('(','').replace(')','').split(',')
+            for i in range( len(ui_list) ):
+                each_tab = self.uiList[ui_list[i]]
+                each_name = 'tab_'+str(i)
+                if i < len(tab_names):
+                    if tab_names[i] != '':
+                        each_name = tab_names[i]
+                if isinstance(each_tab, QtWidgets.QWidget):
+                    cur_layout.addTab(each_tab, each_name)
+                else:
+                    tmp_holder = QtWidgets.QWidget()
+                    tmp_holder.setLayout(each_tab)
+                    parentObject.addTab(tmp_holder, each_name)
+        else:
             return
-        for ui in ui_list:
-            ui_option = ''
-            if ';' in ui:
-                ui,ui_option = ui.split(';',1)
-            if isinstance(self.uiList[ui], QtWidgets.QWidget):
-                cur_layout.addWidget(self.uiList[ui])
-            elif isinstance(self.uiList[ui], QtWidgets.QSpacerItem):
-                cur_layout.addItem(self.uiList[ui])
-            elif isinstance(self.uiList[ui], QtWidgets.QLayout):
-                cur_layout.addLayout(self.uiList[ui])
     def quickMsg(self, msg, block=1, ask=0):
         tmpMsg = QtWidgets.QMessageBox(self) # for simple msg that no need for translation
         tmpMsg.setWindowTitle("Info")
@@ -246,7 +317,8 @@ class ClassName(QtWidgets.QWidget):
             return 0
     def quickInfo(self, info, force=0):
         if hasattr( self.window(), "quickInfo") and force == 0:
-            self.window().statusBar().showMessage(info)
+            if hasattr(self.window(), 'statusBar'):
+                self.window().statusBar().showMessage(info)
     def qui_policy(self, ui_list, w, h):
         # reference value
         policyList = ( 
