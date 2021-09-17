@@ -523,6 +523,14 @@ display_textEdit.setZoom(1) # enable text zoom feature
 
 **feature list**
 
+  * v4.4 (2021.09.17):
+    * add support for file path, file name drag and drop (default insert dropped file paths, ctrl: drop names, ctrl+shift: drop root path + names)
+  * v4.3 (2020.02.14): 
+    * add monoFont function
+  * v4.2
+    * fix lineWrap cmd typo
+  * v4.1
+    * fix qt5 qpallete code in qtgui
   * version 4.0: (2016.12.08)
     * python 3 support
     * pyside, pyside2, pyqt4, pyqt5 support
