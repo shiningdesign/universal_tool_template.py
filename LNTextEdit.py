@@ -1,9 +1,11 @@
 '''
-LNTextEdit v4.3
+LNTextEdit v4.4
 Text widget with support for line numbers
 http://john.nachtimwald.com/2009/08/19/better-qplaintextedit-with-line-numbers/
 
 mod: by ying - http://shining-lucy.com/wiki
+v4.4 (2021.09.17):
+  * add support for file path, file name drag and drop
 v4.3 (2020.02.14): 
   * add monoFont function
 v4.2
@@ -54,7 +56,7 @@ except ImportError:
             import sip
             qtMode = 3
             print("PyQt5 Try")
-            
+import os
 class LNTextEdit(QtWidgets.QFrame):
  
     class NumberBar(QtWidgets.QWidget):
@@ -110,8 +112,16 @@ class LNTextEdit(QtWidgets.QFrame):
             data = event.mimeData()
             urls = data.urls()
             if ( urls and urls[0].scheme() == 'file' ):
-                txt = "\n".join( [unicode(url.path())[1:] for url in urls] ) # remove 1st / char
-                self.insertPlainText( txt ) 
+                mod = self.quickModKeyAsk()
+                if mod == 1: # ctrl
+                    txt = "\n".join( [ os.path.basename(unicode(url.path())[1:]) for url in urls] ) # remove 1st / char
+                    self.insertPlainText( txt ) 
+                elif mod == 6: # ctrl +shift
+                    txt = "\n".join([os.path.dirname(unicode(urls[0].path())[1:])]+ [ os.path.basename(unicode(url.path())[1:]) for url in urls] ) # remove 1st / char
+                    self.insertPlainText( txt ) 
+                else:
+                    txt = "\n".join( [unicode(url.path())[1:] for url in urls] ) # remove 1st / char
+                    self.insertPlainText( txt ) 
         def zoom_in(self):
             font = self.document().defaultFont()
             size = font.pointSize()
@@ -182,7 +192,24 @@ class LNTextEdit(QtWidgets.QFrame):
                 block = block.next()
  
             painter.end()
- 
+        def quickModKeyAsk(self):
+            modifiers = QtWidgets.QApplication.queryKeyboardModifiers()
+            clickMode = 0 # basic mode
+            if modifiers == QtCore.Qt.ControlModifier:
+                clickMode = 1 # ctrl
+            elif modifiers == QtCore.Qt.ShiftModifier:
+                clickMode = 2 # shift
+            elif modifiers == QtCore.Qt.AltModifier:
+                clickMode = 3 # alt
+            elif modifiers == QtCore.Qt.ControlModifier | QtCore.Qt.ShiftModifier | QtCore.Qt.AltModifier:
+                clickMode = 4 # ctrl+shift+alt
+            elif modifiers == QtCore.Qt.ControlModifier | QtCore.Qt.AltModifier:
+                clickMode = 5 # ctrl+alt
+            elif modifiers == QtCore.Qt.ControlModifier | QtCore.Qt.ShiftModifier:
+                clickMode = 6 # ctrl+shift
+            elif modifiers == QtCore.Qt.AltModifier | QtCore.Qt.ShiftModifier:
+                clickMode = 7 # alt+shift
+            return clickMode
     def __init__(self, *args):
         QtWidgets.QFrame.__init__(self, *args)
  
