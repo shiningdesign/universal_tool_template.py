@@ -63,6 +63,7 @@ New Revolution of UTT - version 2000 series:
 v2020 (public release):
   * (2022.08.07) 
     - add unity support with unity python package
+
 v2010 (public release):
   * (2022.08.07)
     - fix long to int for Maya 2022 python3
