@@ -1,6 +1,6 @@
 # Univeral Tool Template v20.2
 tpl_ver = 20.20
-tpl_date = 220503
+tpl_date = 220807
 print("tpl_ver: {0}-{1}".format(tpl_ver, tpl_date))
 # by ying - https://github.com/shiningdesign/universal_tool_template.py
 
