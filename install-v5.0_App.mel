@@ -40,7 +40,7 @@ string $tool_info[] = `Tool_Location_v2`;
 string $icon=$tool_info[0] + "icons/" + $tool_info[1] +".png";
 string $cmd ="import sys;myPath='"+$tool_info[0]+"';myPath in sys.path or sys.path.append(myPath);";
 $cmd+="import "+$tool_info[1]+";"+$tool_info[1]+".main()";
-string $reload_cmd ="reload("+$tool_info[1]+");";
+string $reload_cmd ="from imp import reload;reload("+$tool_info[1]+");";
 // - step 3: create shelf btn
 string $curBtn = `shelfButton -c $cmd -ann $tool_info[1] -l $tool_info[1] -imageOverlayLabel $tool_info[2] -overlayLabelColor 0 0 0 -overlayLabelBackColor 0 0 0 0.0 -image $icon -image1 $icon -sourceType "python"`;
 string $curPop = `popupMenu -parent $curBtn -button 1 -ctl 1`; // sh, alt, ctl

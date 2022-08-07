@@ -1,6 +1,6 @@
-# Univeral Tool Template v20.1
-tpl_ver = 20.10
-tpl_date = 201203
+# Univeral Tool Template v20.2
+tpl_ver = 20.20
+tpl_date = 220503
 print("tpl_ver: {0}-{1}".format(tpl_ver, tpl_date))
 # by ying - https://github.com/shiningdesign/universal_tool_template.py
 
@@ -16,6 +16,7 @@ hostModeList = [
     ['blender', {'bpy':'bpy'} ],
     ['krita', {'krita':'krita'} ],
     ['unreal', {'unreal':'unreal'} ],
+    ['unity', {'UnityEngine':'unity'} ],
     ['npp', {'Npp':'Npp'} ],
 ]
 for name, libs in hostModeList:
@@ -1197,7 +1198,7 @@ def main(mode=0):
             parentWin = sip.wrapinstance(int(mui.MQtUtil.mainWindow()), QtCore.QObject)
     # create app object for certain host
     global app_UserClassUI
-    if hostMode in ('desktop', 'blender', 'unreal', 'npp', 'fusion'):
+    if hostMode in ('desktop', 'blender', 'unreal', 'unity', 'npp', 'fusion'):
         # single instance app mode on windows
         if osMode == 'win':
             # check if already open for single desktop instance
