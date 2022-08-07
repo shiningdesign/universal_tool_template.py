@@ -6,7 +6,7 @@ A quick Qt GUI tool development template for cross-platform standalone desktop t
   * (BlackMagic) Fusion
   * Blender (the free cross-platform 3D application, need install pyside2 as instructed below)
   * Unreal 4.25 (the free game engine, need to install python plugin and pyside, instruction below)
-  * Unity 2022 (the free game engine, need to install python package)
+  * Unity 2020 (the free game engine, need to install python package)
   * Krita (the free Photoshop alternative)
   * Notepad++ (the code editor, need PythonScript plugin installed)
   * standalone desktop
