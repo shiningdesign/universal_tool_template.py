@@ -6,6 +6,7 @@ A quick Qt GUI tool development template for cross-platform standalone desktop t
   * (BlackMagic) Fusion
   * Blender (the free cross-platform 3D application, need install pyside2 as instructed below)
   * Unreal 4.25 (the free game engine, need to install python plugin and pyside, instruction below)
+  * Unity 2022 (the free game engine, need to install python package)
   * Krita (the free Photoshop alternative)
   * Notepad++ (the code editor, need PythonScript plugin installed)
   * standalone desktop
@@ -24,7 +25,7 @@ Key Feature
 
 | Feature | Description |
 | :------------- |:-------------|
-| **Host Detection** | Maya, Houdini, Nuke, Fusion, Blender, Unreal, Krita, Notepad++, Desktop |
+| **Host Detection** | Maya, Houdini, Nuke, Fusion, Blender, Unreal, Unity, Krita, Notepad++, Desktop |
 | **Python Detection** | 2.x, 3.x, 32bit, 64bit |
 | **Qt Binding Detection** | PySide, PyQt4, PySide2, PyQt5 |
 | **Universal Coding** | seamlessly works in above 2x2x4=16 combinations |
@@ -59,7 +60,12 @@ v1010 (public release):
 
 New Revolution of UTT - version 2000 series:
 -------------
+v2020 (public release):
+  * (2022.08.07) 
+    - add unity support with unity python package
 v2010 (public release):
+  * (2022.08.07)
+    - fix long to int for Maya 2022 python3
   * (2020.09.08)
     - update comment section and quickInfo() status bar check
   * (2020.07.14) 
@@ -315,6 +321,13 @@ cd D:\my_path_to_version\UE_4.25\Engine\Binaries\ThirdParty\Python\Win64
 D:
 .\python.exe -m pip install PySide
 ```
+
+Get Python3, PySide2 for Unity 2020 onwards
+-------------
+
+Detail guide on my wiki for now:
+
+http://shining-lucy.com/wiki/page.php?id=appwiki:unity#python_and_qt_inside_unity
 
 One-line Multi-UI Creation Syntax
 ===================
@@ -597,6 +610,8 @@ auto maya shelf installer v5.0 (install-v5.0_App.mel)
   * a script template that automatically install its nearby python tool to shelf, with icon set as well, in a simple process of drag-n-drop into maya window.
 
 **feature and usage**:
+  * version 5.0 (2022.08.07)
+    * reload change to from imp import reload; so in Maya 2022, it works
   * version 5.0 (2017.04.10)
     * ctrl+ LMB click to pop "reload" submenu. Thus, no need reload and install, just 1 mel script to hold 2 features
   * version 3.0 (2016.12.20):
