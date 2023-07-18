@@ -631,3 +631,12 @@ cross-platform cx_Freeze binary build script
 ```
 python ToolName_buildScript.py build
 ```
+
+Extra notes: 
+  * if you need console popup at same time, remove comment from base=None and comment the Win32GUI line
+  * if you use requests, make sure in your main code, add below after import requests
+```
+# fix for cx_freeze
+from multiprocessing import Queue
+```
+  * also remove ssl module from exclude_lib_list below
